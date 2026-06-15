@@ -239,7 +239,7 @@
         input:focus, select:focus, textarea:focus {
             outline: none;
             border-color: var(--cor-principal);
-            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1.5);
+            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.15);
         }
 
         .btn {
@@ -318,7 +318,6 @@
         .card-metrica p { margin: 4px 0 0 0; font-size: 20px; font-weight: bold; color: var(--cor-texto); }
         .bloco-grafico-caixa { background: var(--cor-card); border: 1px solid var(--cor-borda); padding: 14px; border-radius: var(--border-radius-md); display: flex; justify-content: center; align-items: center; min-height: 220px; max-height: 260px; box-shadow: var(--shadow-sm); }
 
-        /* Estilos específicos para impressão térmica */
         @media print {
             @page { size: 58mm auto; margin: 0mm; }
             .no-print { display: none !important; }
@@ -340,6 +339,7 @@
 </head>
 <body>
 
+    <!-- TELA DE LOGIN -->
     <div id="tela-login" class="no-print">
         <div class="card-login">
             <h2 style="color: var(--cor-principal); margin: 0 0 6px 0; text-transform: uppercase; font-size: 20px; font-weight: 800; letter-spacing: 0.5px;">PowerNutri Cloud</h2>
@@ -359,6 +359,7 @@
         </div>
     </div>
 
+    <!-- NAVEGAÇÃO MOBILE -->
     <nav class="mobile-tabs-nav no-print" id="navegacao-abas-id">
         <button class="tab-btn active" onclick="alternarAbaMobile('venda', this)">📝 <span>Caixa</span></button>
         <button class="tab-btn" onclick="alternarAbaMobile('cadastro', this)">📦 <span>Cadastrar</span></button>
@@ -370,6 +371,7 @@
         <button class="tab-btn" onclick="alternarAbaMobile('logs', this)">📋 <span>Logs</span></button>
     </nav>
 
+    <!-- CONTEÚDO PRINCIPAL -->
     <div id="conteudo-sistema">
         <div class="brand-header no-print">
             <div style="background: var(--cor-principal); padding: 6px; border-radius: var(--border-radius-md); font-weight: 900; color: #fff;">PN</div>
@@ -378,6 +380,7 @@
 
         <div class="main-grid no-print">
             
+            <!-- ABA CAIXA / REGISTRAR VENDA -->
             <div class="card active-tab-card" id="card-aba-venda">
                 <h3>📝 Frente de Caixa (PDV)</h3>
                 <form id="form-item" onsubmit="adicionarItem(event)">
@@ -435,6 +438,7 @@
                 </form>
             </div>
 
+            <!-- ABA NOVO CADASTRO DE PRODUTO -->
             <div class="card" id="card-aba-cadastro">
                 <h3>📦 Cadastrar Produto no Banco de Dados</h3>
                 <form id="form-cadastro-produto">
@@ -460,6 +464,7 @@
                 </form>
             </div>
 
+            <!-- CHECKOUT / CARRINHO -->
             <div class="card carrinho-container" id="card-aba-carrinho">
                 <h3>🛒 Checkout do Pedido</h3>
                 <ul id="lista-itens" class="lista-itens"></ul>
@@ -469,6 +474,7 @@
                 </div>
             </div>
 
+            <!-- FECHAMENTO DE TURNO -->
             <div class="card card-fechamento-compacto" id="card-aba-fechamento">
                 <h3>🔒 Fechamento Consolidado de Caixa</h3>
                 <div class="container-botoes-fechamento" style="display: flex; flex-direction: column; gap: 8px;">
@@ -501,6 +507,7 @@
                 </div>
             </div>
 
+            <!-- LOGS DE TRANSAÇÕES -->
             <div class="card" id="card-aba-logs">
                 <h3>📋 Logs Analíticos de Transações (Real-time Firebase)</h3>
                 <div class="tabela-wrapper">
@@ -529,16 +536,15 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getFirestore, collection, addDoc, getDocs, doc, setDoc, getDoc, query, orderBy, Timestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-        // ==========================================================================
-        // CONFIGURAÇÃO DO SEU NOVO BANCO DE DADOS (Substitua pelos seus dados novos)
-        // ==========================================================================
+        // Autenticado diretamente no projeto nutri-46260
         const firebaseConfig = {
-            apiKey: "COLE_AQUI_SUA_API_KEY",
-            authDomain: "COLE_AQUI_SEU_AUTH_DOMAIN",
-            projectId: "COLE_AQUI_SEU_PROJECT_ID",
-            storageBucket: "COLE_AQUI_SEU_STORAGE_BUCKET",
-            messagingSenderId: "COLE_AQUI_SEU_MESSAGING_SENDER_ID",
-            appId: "COLE_AQUI_SEU_APP_ID"
+            apiKey: "AIzaSyCw8CMa3-UoWBxXONoNEOrZ-qprr0hUPN8",
+            authDomain: "nutri-46260.firebaseapp.com",
+            projectId: "nutri-46260",
+            storageBucket: "nutri-46260.firebasestorage.app",
+            messagingSenderId: "749055056085",
+            appId: "1:749055056085:web:f6684af0d299789eb7ea5c",
+            measurementId: "G-F03DWZTF6T"
         };
 
         const app = initializeApp(firebaseConfig);
@@ -551,7 +557,6 @@
         let chartPizzaInstancia = null; 
         let horarioCorteTurno = 0; 
 
-        // ALTERNAR ABAS EM DISPOSITIVOS MÓVEIS
         window.alternarAbaMobile = function(abaNome, elementoBtn) {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             if(elementoBtn) elementoBtn.classList.add('active');
@@ -571,11 +576,10 @@
             window.scrollTo({ top: 0, behavior: 'instant' });
         };
 
-        // EVENTO: BUSCA DINÂMICA DE PRODUTO POR CÓDIGO DE BARRAS NO CAIXA
         const inputEanVenda = document.getElementById('venda-codigo-barras');
         inputEanVenda.addEventListener('input', async (e) => {
             const codigo = e.target.value.trim();
-            if(codigo.length >= 3) { // Começa a buscar a partir de 3 dígitos para agilizar leitores rápidos
+            if(codigo.length >= 3) {
                 try {
                     const docRef = doc(db, "produtos", codigo);
                     const docSnap = await getDoc(docRef);
@@ -584,9 +588,8 @@
                         document.getElementById('produto-nome').value = prodData.nome;
                         document.getElementById('produto-tipo').value = prodData.tipo;
                         document.getElementById('valor').value = parseFloat(prodData.preco).toFixed(2);
-                        document.getElementById('quantidade').focus(); // Joga o cursor para a quantidade automaticamente
+                        document.getElementById('quantidade').focus();
                     } else {
-                        // Limpa se não achar
                         document.getElementById('produto-nome').value = '';
                         document.getElementById('produto-tipo').value = '';
                         document.getElementById('valor').value = '';
@@ -597,7 +600,6 @@
             }
         });
 
-        // EVENTO: SALVAR NOVO PRODUTO COM CÓDIGO DE BARRAS COMO ID
         const formCadastro = document.getElementById('form-cadastro-produto');
         formCadastro.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -607,14 +609,13 @@
             const preco = parseFloat(document.getElementById('cad-produto-valor').value);
 
             try {
-                // O código de barras vira o ID exato do documento para busca ultra rápida O(1)
                 await setDoc(doc(db, "produtos", ean), {
                     nome: nome,
                     tipo: tipo,
                     preco: preco,
                     cadastradoEm: Timestamp.now()
                 });
-                alert(`Sucesso! Produto "${nome}" vinculado ao EAN: ${ean}`);
+                alert(`Sucesso! Produto "${nome}" cadastrado.`);
                 formCadastro.reset();
                 document.getElementById('cad-codigo-barras').focus();
             } catch (erro) {
@@ -623,7 +624,6 @@
             }
         });
 
-        // BUSCAR CLIENTE PELO WHATSAPP
         window.buscarClientePorTelefone = async function(telDigitado) {
             const telLimpo = telDigitado.replace(/\D/g, ""); 
             if (telLimpo.length < 8) return;
@@ -674,8 +674,8 @@
             const usuarioInput = document.getElementById('login-usuario').value.trim();
             const senhaInput = document.getElementById('login-senha').value.trim();
             
-            // Senha padrão original mantida em Base64 ("MTkwNjIw")
-            if (usuarioInput.toLowerCase() === "gabriele" && btoa(senhaInput) === "MTkwNjIw") {
+            // Usuario: leo | Senha: apollo25 (Hash em Base64: YXBvbGxvMjU=)
+            if (usuarioInput.toLowerCase() === "leo" && btoa(senhaInput) === "YXBvbGxvMjU=") {
                 document.getElementById('tela-login').style.display = 'none';
                 document.getElementById('conteudo-sistema').style.display = 'block';
                 await sincronizarHorarioCorteCloud();
@@ -735,7 +735,6 @@
             }
         }
 
-        // ADICIONAR ITEM DA VENDA AO CHECKOUT
         window.adicionarItem = function(event) {
             event.preventDefault();
             const ean = document.getElementById('venda-codigo-barras').value.trim();
@@ -749,7 +748,7 @@
 
             pedidoAtual.push({ 
                 id: Date.now(), 
-                prato: nome, // Mapeado na mesma chave do original para preservar integridade
+                prato: nome, 
                 tipo: tipo, 
                 precoUnitario: precoUnitario, 
                 qtd: qtd, 
@@ -760,7 +759,6 @@
             
             atualizarInterface();
 
-            // Reseta campos do produto
             document.getElementById('venda-codigo-barras').value = '';
             document.getElementById('produto-nome').value = '';
             document.getElementById('produto-tipo').value = '';
@@ -802,7 +800,6 @@
             }
         }
 
-        // COMPILAR E EMITIR DUPLA VIA DO CUPOM TÉRMICO
         function gerarHtmlFitaVia(pedido, nomeVia) {
             let dadosCliente = pedido.clienteHtml ? pedido.clienteHtml : '<strong>Consumidor Final</strong>';
 
@@ -933,7 +930,6 @@
             }
         };
 
-        // PROCESSAR DASHBOARD E FECHAMENTO FINANCEIRO
         window.calcularFechamentoDiario = function() {
             if (historicoGeralPedidos.length === 0) {
                 alert("Não existem vendas registradas no turno atual.");
@@ -1006,7 +1002,6 @@
             document.getElementById('btn-reset-id').style.display = 'flex';
         };
 
-        // EXPORTAR RELATÓRIO COMPLETO EM PDF A4 (VIA IFRAME OCULTO)
         window.exportarFechamentoPDF = function() {
             if (!dadosFechamentoRelatorio) return;
 
@@ -1081,7 +1076,6 @@
             });
         };
 
-        // ENCERRAMENTO E ALINHAMENTO DE TURNO GLOBAL VIA SENHA MASTER (1234)
         window.reiniciarTurnoComSenha = async function() {
             const senhaDigitada = prompt("Para zerar o caixa e iniciar o próximo turno, digite a senha master:");
             if (senhaDigitada === "1234") {
@@ -1090,7 +1084,7 @@
                 try {
                     await setDoc(doc(db, "configuracoes", "turno_atual"), {
                         horarioCorte: novoHorarioCorte,
-                        atualizadoPor: "gabriele",
+                        atualizadoPor: "leo",
                         timestamp: Timestamp.now()
                     });
                     
@@ -1106,7 +1100,7 @@
                     document.getElementById('btn-pdf-id').style.display = 'none';
                     document.getElementById('btn-reset-id').style.display = 'none';
                     
-                    alert("Turno encerrado! O caixa iniciou no Pedido #01 na nuvem.");
+                    alert("Turno encerrado globalmente.");
                     await carregarHistoricoDoFirebase();
                 } catch(e) {
                     alert("Erro de conexão.");
