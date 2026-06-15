@@ -13,9 +13,9 @@
            --- DESIGN SYSTEM FITNESS E INTERFACE OPERACIONAL PREMIUM ---
            ========================================================================== */
         :root {
-            --cor-principal: #f97316; /* Laranja Fitness / Energético */
+            --cor-principal: #f97316; /* Laranja Fitness */
             --cor-principal-hover: #ea580c;
-            --cor-fundo: #0f172a; /* Slate Escuro Premium */
+            --cor-fundo: #0f172a; /* Deep Slate */
             --cor-card: #1e293b;
             --cor-texto: #f8fafc;
             --cor-texto-secundario: #94a3b8;
@@ -81,13 +81,13 @@
             justify-content: flex-start;
             gap: 12px;
             background: var(--cor-card);
-            padding: 12px 16px;
+            padding: 14px 20px;
             border-radius: var(--border-radius-lg);
             width: 100%;
             box-shadow: var(--shadow-sm);
             box-sizing: border-box;
             border: 1px solid var(--cor-borda);
-            margin-bottom: 12px;
+            margin-bottom: 20px;
         }
 
         .brand-header h1 {
@@ -99,7 +99,6 @@
         }
 
         @media(min-width: 950px) {
-            .brand-header { gap: 16px; padding: 16px 28px; margin-bottom: 20px; }
             .brand-header h1 { font-size: 22px; }
         }
 
@@ -137,7 +136,7 @@
         .main-grid {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 16px;
+            gap: 20px;
             width: 100%;
             box-sizing: border-box;
         }
@@ -148,19 +147,18 @@
         }
 
         @media(min-width: 950px) {
-            .main-grid { grid-template-columns: 1.2fr 1fr; gap: 20px; }
+            .main-grid { grid-template-columns: 1.2fr 1fr; }
             .full-width-grid { grid-column: span 2; }
             .main-grid > .card { display: block !important; }
         }
 
         .card {
             background-color: var(--cor-card);
-            padding: 16px;
+            padding: 20px;
             border-radius: var(--border-radius-lg);
             box-shadow: var(--shadow-sm);
             border: 1px solid var(--cor-borda);
             box-sizing: border-box;
-            margin-bottom: 16px;
         }
 
         @media(min-width: 768px) {
@@ -168,9 +166,9 @@
         }
 
         h3 {
-            margin: 0 0 16px 0;
+            margin: 0 0 20px 0;
             color: var(--cor-texto);
-            font-size: 14px;
+            font-size: 15px;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -178,7 +176,7 @@
             align-items: center;
             gap: 8px;
             border-bottom: 1px solid var(--cor-borda);
-            padding-bottom: 8px;
+            padding-bottom: 10px;
         }
 
         .secao-titulo {
@@ -186,27 +184,26 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
             color: var(--cor-principal);
-            margin: 14px 0 8px 0;
+            margin: 18px 0 10px 0;
             font-weight: 700;
         }
 
         .form-row {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 12px;
+            gap: 14px;
         }
 
         @media(min-width: 480px) {
             .form-row.dois-campos { grid-template-columns: 1fr 1fr; }
             .form-row.tres-campos { grid-template-columns: 1fr 1fr 1fr; }
-            .form-row.quatro-campos { grid-template-columns: 1fr 1fr 1fr 1fr; }
         }
 
-        .form-group { margin-bottom: 10px; }
+        .form-group { margin-bottom: 12px; }
 
         label {
             display: block;
-            margin-bottom: 4px;
+            margin-bottom: 6px;
             font-weight: 600;
             color: var(--cor-texto-secundario);
             font-size: 12px;
@@ -218,15 +215,11 @@
             border: 1px solid var(--cor-borda);
             border-radius: var(--border-radius-md);
             box-sizing: border-box;
-            font-size: 16px; 
+            font-size: 15px; 
             font-family: inherit;
             background-color: #0f172a;
             color: var(--cor-texto);
             transition: var(--transition);
-        }
-
-        @media(min-width: 950px) {
-            input, select, textarea { font-size: 14px; padding: 10px 12px; }
         }
 
         input:focus, select:focus, textarea:focus {
@@ -237,7 +230,7 @@
 
         .btn {
             border: none;
-            padding: 14px 20px;
+            padding: 14px 24px;
             font-size: 14px;
             border-radius: var(--border-radius-md);
             cursor: pointer;
@@ -251,7 +244,7 @@
         }
 
         @media(min-width: 950px) {
-            .btn { width: auto; padding: 10px 20px; }
+            .btn { width: auto; }
         }
 
         .btn-add { background-color: var(--cor-principal); color: white; margin-top: 10px; }
@@ -306,13 +299,13 @@
         .estoque-indicator {
             font-size: 12px;
             font-weight: bold;
-            margin-top: 4px;
-            padding: 6px;
+            margin-top: 6px;
+            padding: 8px 12px;
             border-radius: var(--border-radius-md);
             display: none;
         }
-        .estoque-ok { background: rgba(16, 185, 129, 0.15); color: #10b981; }
-        .estoque-baixo { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+        .estoque-ok { background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); }
+        .estoque-baixo { background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); }
 
         @media print {
             @page { size: 58mm auto; margin: 0mm; }
@@ -335,7 +328,6 @@
 </head>
 <body>
 
-    <!-- TELA DE LOGIN -->
     <div id="tela-login" class="no-print">
         <div class="card-login">
             <h2 style="color: var(--cor-principal); margin: 0 0 6px 0; text-transform: uppercase; font-size: 20px; font-weight: 800; letter-spacing: 0.5px;">PowerNutri Cloud</h2>
@@ -355,7 +347,6 @@
         </div>
     </div>
 
-    <!-- NAVEGAÇÃO MOBILE -->
     <nav class="mobile-tabs-nav no-print" id="navegacao-abas-id">
         <button class="tab-btn active" onclick="alternarAbaMobile('venda', this)">📝 <span>Caixa</span></button>
         <button class="tab-btn" onclick="alternarAbaMobile('cadastro', this)">📦 <span>Cadastrar</span></button>
@@ -367,16 +358,14 @@
         <button class="tab-btn" onclick="alternarAbaMobile('logs', this)">📋 <span>Histórico</span></button>
     </nav>
 
-    <!-- CONTEÚDO PRINCIPAL -->
     <div id="conteudo-sistema">
         <div class="brand-header no-print">
-            <div style="background: var(--cor-principal); padding: 6px; border-radius: var(--border-radius-md); font-weight: 900; color: #fff;">PN</div>
+            <div style="background: var(--cor-principal); padding: 6px 10px; border-radius: var(--border-radius-md); font-weight: 900; color: #fff;">PN</div>
             <h1>PowerNutri — Suplementação Esportiva</h1>
         </div>
 
         <div class="main-grid no-print">
             
-            <!-- ABA CAIXA / REGISTRAR VENDA -->
             <div class="card active-tab-card" id="card-aba-venda">
                 <h3>📝 Frente de Caixa (PDV)</h3>
                 <form id="form-item" onsubmit="adicionarItem(event)">
@@ -435,7 +424,6 @@
                 </form>
             </div>
 
-            <!-- ABA NOVO CADASTRO DE PRODUTO COMPLETO COM ESTOQUE -->
             <div class="card" id="card-aba-cadastro">
                 <h3>📦 Cadastrar Produto e Inventário</h3>
                 <form id="form-cadastro-produto">
@@ -447,13 +435,13 @@
                         <label>Nome do Suplemento:</label>
                         <input type="text" id="cad-produto-nome" placeholder="Ex: 100% Whey Prime - Growth" required>
                     </div>
-                    <div class="form-row três-campos" style="grid-template-columns: 1.5fr 1fr;">
+                    <div class="form-row dois-campos">
                         <div class="form-group">
                             <label>Variação (Sabor/Peso):</label>
                             <input type="text" id="cad-produto-tipo" placeholder="Ex: 1kg - Chocolate" required>
                         </div>
                         <div class="form-group">
-                            <label>Preço de Venda (R$):</label>
+                            <label>Preço de Venda Praticado (R$):</label>
                             <input type="number" id="cad-produto-valor" step="0.01" min="0" placeholder="0,00" required>
                         </div>
                     </div>
@@ -473,7 +461,6 @@
                 </form>
             </div>
 
-            <!-- CHECKOUT / CARRINHO -->
             <div class="card carrinho-container" id="card-aba-carrinho">
                 <h3>🛒 Checkout do Pedido</h3>
                 <ul id="lista-itens" class="lista-itens"></ul>
@@ -483,7 +470,6 @@
                 </div>
             </div>
 
-            <!-- FECHAMENTO FINANCEIRO POR PERÍODO SELECIONÁVEL -->
             <div class="card card-fechamento-compacto" id="card-aba-fechamento">
                 <h3>📊 Fechamento & Consolidação por Período</h3>
                 
@@ -527,7 +513,6 @@
                 </div>
             </div>
 
-            <!-- LOGS DE TRANSAÇÕES GERAIS PERMANENTES -->
             <div class="card" id="card-aba-logs">
                 <h3>📋 Histórico Geral de Transações (Tempo Real)</h3>
                 <div class="tabela-wrapper">
@@ -572,8 +557,9 @@
         let todosOsPedidosBanco = []; 
         let dadosFechamentoRelatorio = null;
         let chartPizzaInstancia = null; 
-        let estoqueFisicoDisponivel = 0; // Armazena temporariamente o saldo do EAN ativo no caixa
+        let estoqueFisicoDisponivel = 0; 
 
+        // Inicializa campos de filtro com o dia de hoje
         const hojeIso = new Date().toISOString().split('T')[0];
         document.getElementById('filtro-data-inicio').value = hojeIso;
         document.getElementById('filtro-data-fim').value = hojeIso;
@@ -597,7 +583,7 @@
             window.scrollTo({ top: 0, behavior: 'instant' });
         };
 
-        // LÓGICA DE AUDITORIA DE ESTOQUE EM TEMPO REAL NO CAIXA
+        // LEITURA DO CÓDIGO DE BARRAS NO CAIXA COM ALERTA DE MÍNIMO
         const inputEanVenda = document.getElementById('venda-codigo-barras');
         const statusEstoqueIndicator = document.getElementById('venda-estoque-status');
         const btnInserir = document.getElementById('btn-inserir-checkout');
@@ -611,25 +597,24 @@
                     if(docSnap.exists()) {
                         const prodData = docSnap.data();
                         estoqueFisicoDisponivel = parseInt(prodData.estoqueAtual !== undefined ? prodData.estoqueAtual : 0);
-                        const estMinimo = parseInt(prodData.estoqueMinimo || 2);
+                        const estMinimo = parseInt(prodData.estoqueMinimo !== undefined ? prodData.estoqueMinimo : 2);
 
                         document.getElementById('produto-nome').value = prodData.nome;
                         document.getElementById('produto-tipo').value = prodData.tipo;
                         document.getElementById('valor').value = parseFloat(prodData.preco).toFixed(2);
                         
-                        // Exibe indicador visual de estoque no caixa
                         statusEstoqueIndicator.style.display = "block";
                         if(estoqueFisicoDisponivel <= estMinimo) {
                             statusEstoqueIndicator.className = "estoque-indicator estoque-baixo";
-                            statusEstoqueIndicator.innerText = `⚠️ Estoque Crítico: Apenas ${estoqueFisicoDisponivel} un. disponíveis!`;
+                            statusEstoqueIndicator.innerText = `⚠️ Alerta de Estoque Mínimo: Restam apenas ${estoqueFisicoDisponivel} un!`;
                         } else {
                             statusEstoqueIndicator.className = "estoque-indicator estoque-ok";
-                            statusEstoqueIndicator.innerText = `✅ Estoque Regular: ${estoqueFisicoDisponivel} un. disponíveis.`;
+                            statusEstoqueIndicator.innerText = `✅ Saldo Regular: ${estoqueFisicoDisponivel} un. em estoque.`;
                         }
 
                         if(estoqueFisicoDisponivel <= 0) {
                             btnInserir.disabled = true;
-                            btnInserir.innerText = "❌ Produto Esgotado";
+                            btnInserir.innerText = "❌ Sem Saldo em Estoque";
                         } else {
                             btnInserir.disabled = false;
                             btnInserir.innerText = "＋ Inserir no Checkout";
@@ -639,7 +624,7 @@
                         resetaCamposVenda();
                     }
                 } catch (erro) {
-                    console.error("Erro ao ler código de barras: ", erro);
+                    console.error("Erro na leitura EAN: ", erro);
                 }
             }
         });
@@ -654,7 +639,7 @@
             estoqueFisicoDisponivel = 0;
         }
 
-        // CADASTRO COMPLETO COM DADOS DE ESTOQUE
+        // SALVAR NOVO PRODUTO COM CAMPOS DE ESTOQUE ATUAL E MÍNIMO
         const formCadastro = document.getElementById('form-cadastro-produto');
         formCadastro.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -674,7 +659,7 @@
                     estoqueMinimo: minimo,
                     cadastradoEm: Timestamp.now()
                 });
-                alert(`Sucesso! "${nome}" cadastrado com estoque inicial de ${estoque} unidades.`);
+                alert(`Sucesso! Suplemento "${nome}" cadastrado com controle de estoque.`);
                 formCadastro.reset();
                 document.getElementById('cad-codigo-barras').focus();
             } catch (erro) {
@@ -774,9 +759,8 @@
             const qtd = parseInt(document.getElementById('quantidade').value);
             const pagamento = document.getElementById('forma-pagamento').value;
 
-            // Bloqueio extra para impedir inserção caso mude a quantidade manualmente acima do estoque ativo
             if(qtd > estoqueFisicoDisponivel) {
-                alert(`Erro de Saldo! Você está tentando vender ${qtd} unidades, mas existem apenas ${estoqueFisicoDisponivel} unidades desse suplemento em estoque.`);
+                alert(`Erro de Saldo! Limite em estoque para este item: ${estoqueFisicoDisponivel} un.`);
                 return;
             }
 
@@ -885,7 +869,7 @@
             window.print();
         };
 
-        // FECHAMENTO DA VENDA COM CRIAÇÃO DE TRANSAÇÃO ATÔMICA DA NUVEM (DEDUÇÃO SEGURA DE ESTOQUE)
+        // FECHAMENTO DA VENDA COM TRANSAÇÃO ATÔMICA DA NUVEM (DEDUÇÃO DO ESTOQUE)
         window.finalizarEImprimirTicket = async function() {
             if (pedidoAtual.length === 0) {
                 alert("Nenhum item lançado no checkout!");
@@ -939,39 +923,33 @@
             };
 
             try {
-                // EXECUÇÃO DA TRANSAÇÃO DA NUVEM - ANTI CONCORRÊNCIA E QUEBRA DE ESTOQUE
                 await runTransaction(db, async (transaction) => {
-                    // Passo 1: Validar se todos os produtos possuem o saldo em estoque na nuvem antes de baixar
                     const leiturasDeProdutos = [];
                     for (const item of pedidoAtual) {
                         const pRef = doc(db, "produtos", item.ean);
                         leiturasDeProdutos.push({ ref: pRef, doc: await transaction.get(pRef), item: item });
                     }
 
-                    // Passo 2: Validar e Subtrair saldo de cada item de forma atômica
                     for (const obj of leiturasDeProdutos) {
                         if (!obj.doc.exists()) {
-                            throw `Produto com código ${obj.item.ean} não localizado no banco de dados!`;
+                            throw `Produto com código ${obj.item.ean} não localizado!`;
                         }
                         const estoqueAtualBanco = parseInt(obj.doc.data().estoqueAtual || 0);
                         const quantidadeVendida = parseInt(obj.item.qtd);
 
                         if (estoqueAtualBanco < quantidadeVendida) {
-                            throw `Saldo Insuficiente de última hora para o item: "${obj.item.prato}". Disponível no estoque: ${estoqueAtualBanco} un.`;
+                            throw `Saldo Insuficiente de última hora para: "${obj.item.prato}". Disponível: ${estoqueAtualBanco} un.`;
                         }
 
-                        // Atualiza direto no fluxo bloqueado da nuvem
                         transaction.update(obj.ref, {
-                            estoqueAtual: estoqueAtualBanco - quantidadeVendida
+                            estoqueAtual: estoqueAtualBanco - quantityVendida
                         });
                     }
 
-                    // Passo 3: Inserir a venda em si
                     const novoPedidoRef = doc(collection(db, "pedidos"));
                     transaction.set(novoPedidoRef, documentoPedido);
                 });
 
-                // Impressão e limpeza de fluxo se a transação atômica passar
                 const containerFita = document.getElementById('ticket-print');
                 containerFita.innerHTML = gerarHtmlFitaVia(documentoPedido, "EMISSÃO") + gerarHtmlFitaVia(documentoPedido, "VIA CLIENTE");
 
@@ -992,6 +970,7 @@
             }
         };
 
+        // LÓGICA DE FECHAMENTO EXCLUSIVA POR FILTRO DE DATA LIVRE SELECIONÁVEL
         window.calcularFechamentoPorPeriodo = function() {
             const dataInicioStr = document.getElementById('filtro-data-inicio').value;
             const dataFimStr = document.getElementById('filtro-data-fim').value;
