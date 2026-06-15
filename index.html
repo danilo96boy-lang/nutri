@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PowerNutri - PDV e Controle de Suplementos</title>
+    <title>PowerNutri - PDV e Controle de Estoque</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -88,14 +88,6 @@
             box-sizing: border-box;
             border: 1px solid var(--cor-borda);
             margin-bottom: 12px;
-        }
-
-        .brand-logo {
-            width: 40px;
-            height: 40px;
-            object-fit: cover;
-            border-radius: var(--border-radius-md);
-            border: 2px solid var(--cor-principal);
         }
 
         .brand-header h1 {
@@ -207,6 +199,7 @@
         @media(min-width: 480px) {
             .form-row.dois-campos { grid-template-columns: 1fr 1fr; }
             .form-row.tres-campos { grid-template-columns: 1fr 1fr 1fr; }
+            .form-row.quatro-campos { grid-template-columns: 1fr 1fr 1fr 1fr; }
         }
 
         .form-group { margin-bottom: 10px; }
@@ -272,19 +265,11 @@
 
         .btn-reprint { background-color: #2563eb; color: white; padding: 8px 12px; font-size: 11px; border-radius: 6px; font-weight: bold; border: none; width: auto; }
 
-        .btn-fechamento { background-color: #64748b; color: white; width: 100%; }
-        .btn-fechamento:hover { background-color: #475569; }
+        .btn-fechamento { background-color: var(--cor-principal); color: white; width: 100%; }
+        .btn-fechamento:hover { background-color: var(--cor-principal-hover); }
 
-        .btn-pdf { background-color: #2563eb; color: white; display: none; width: 100%; }
+        .btn-pdf { background-color: #2563eb; color: white; width: 100%; }
         .btn-pdf:hover { background-color: #1d4ed8; }
-
-        .btn-reset { background-color: #dc2626; color: white; display: none; width: 100%; }
-        .btn-reset:hover { background-color: #b91c1c; }
-
-        @media(min-width: 480px) {
-            .container-botoes-fechamento { display: flex; gap: 10px; width: 100%; justify-content: flex-end; }
-            .card-fechamento-compacto .btn { width: auto; }
-        }
 
         .carrinho-container { display: flex; flex-direction: column; justify-content: space-between; background: #1e293b; }
 
@@ -310,13 +295,24 @@
         .tabela-comercial th, .tabela-comercial td { padding: 12px 14px; text-align: left; border-bottom: 1px solid var(--cor-borda); vertical-align: top; }
         .tabela-comercial th { background-color: #0f172a; color: var(--cor-texto-secundario); font-weight: 700; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; }
 
-        .dash-container-tela { display: none; grid-template-columns: 1fr; gap: 16px; margin-top: 15px; padding: 12px; background: #0f172a; border: 1px solid var(--cor-borda); border-radius: var(--border-radius-lg); }
+        .dash-container-tela { display: grid; grid-template-columns: 1fr; gap: 16px; margin-top: 15px; padding: 12px; background: #0f172a; border: 1px solid var(--cor-borda); border-radius: var(--border-radius-lg); }
         @media(min-width: 650px) { .dash-container-tela { grid-template-columns: 1fr 1fr; padding: 15px; } .dash-full { grid-column: span 2; } }
         .bloco-metricas-caixa { display: flex; flex-direction: column; gap: 10px; }
         .card-metrica { background: var(--cor-card); border: 1px solid var(--cor-borda); padding: 14px; border-radius: var(--border-radius-md); box-shadow: var(--shadow-sm); }
         .card-metrica h4 { margin: 0; color: var(--cor-texto-secundario); font-size: 11px; text-transform: uppercase; }
         .card-metrica p { margin: 4px 0 0 0; font-size: 20px; font-weight: bold; color: var(--cor-texto); }
         .bloco-grafico-caixa { background: var(--cor-card); border: 1px solid var(--cor-borda); padding: 14px; border-radius: var(--border-radius-md); display: flex; justify-content: center; align-items: center; min-height: 220px; max-height: 260px; box-shadow: var(--shadow-sm); }
+
+        .estoque-indicator {
+            font-size: 12px;
+            font-weight: bold;
+            margin-top: 4px;
+            padding: 6px;
+            border-radius: var(--border-radius-md);
+            display: none;
+        }
+        .estoque-ok { background: rgba(16, 185, 129, 0.15); color: #10b981; }
+        .estoque-baixo { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
 
         @media print {
             @page { size: 58mm auto; margin: 0mm; }
@@ -367,8 +363,8 @@
             🛒 <span>Pedido</span>
             <span class="badge-carrinho" id="badge-contador-id">0</span>
         </button>
-        <button class="tab-btn" onclick="alternarAbaMobile('fechamento', this)">🔒 <span>Turno</span></button>
-        <button class="tab-btn" onclick="alternarAbaMobile('logs', this)">📋 <span>Logs</span></button>
+        <button class="tab-btn" onclick="alternarAbaMobile('fechamento', this)">📊 <span>Fechamento</span></button>
+        <button class="tab-btn" onclick="alternarAbaMobile('logs', this)">📋 <span>Histórico</span></button>
     </nav>
 
     <!-- CONTEÚDO PRINCIPAL -->
@@ -389,6 +385,7 @@
                     <div class="form-group">
                         <label>Bipar ou Digitar Código de Barras:</label>
                         <input type="text" id="venda-codigo-barras" placeholder="Passe o leitor de código de barras ou digite..." autofocus>
+                        <div id="venda-estoque-status" class="estoque-indicator"></div>
                     </div>
 
                     <div class="secao-titulo">2. Dados do Produto</div>
@@ -434,33 +431,45 @@
                         </div>
                     </div>
 
-                    <button type="submit" class="btn btn-add">＋ Inserir no Checkout</button>
+                    <button type="submit" id="btn-inserir-checkout" class="btn btn-add">＋ Inserir no Checkout</button>
                 </form>
             </div>
 
-            <!-- ABA NOVO CADASTRO DE PRODUTO -->
+            <!-- ABA NOVO CADASTRO DE PRODUTO COMPLETO COM ESTOQUE -->
             <div class="card" id="card-aba-cadastro">
-                <h3>📦 Cadastrar Produto no Banco de Dados</h3>
+                <h3>📦 Cadastrar Produto e Inventário</h3>
                 <form id="form-cadastro-produto">
                     <div class="form-group">
-                        <label>Código de Barras da Embalagem (Bipar aqui):</label>
+                        <label>Código de Barras da Embalagem (EAN):</label>
                         <input type="text" id="cad-codigo-barras" placeholder="Bipe o código impresso no pote/embalagem" required>
                     </div>
                     <div class="form-group">
                         <label>Nome do Suplemento:</label>
                         <input type="text" id="cad-produto-nome" placeholder="Ex: 100% Whey Prime - Growth" required>
                     </div>
-                    <div class="form-row dois-campos">
+                    <div class="form-row três-campos" style="grid-template-columns: 1.5fr 1fr;">
                         <div class="form-group">
                             <label>Variação (Sabor/Peso):</label>
                             <input type="text" id="cad-produto-tipo" placeholder="Ex: 1kg - Chocolate" required>
                         </div>
                         <div class="form-group">
-                            <label>Preço de Venda Praticado (R$):</label>
+                            <label>Preço de Venda (R$):</label>
                             <input type="number" id="cad-produto-valor" step="0.01" min="0" placeholder="0,00" required>
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-cadastrar">💾 Salvar Produto na Nuvem</button>
+                    
+                    <div class="secao-titulo">Controle Inteligente de Estoque</div>
+                    <div class="form-row dois-campos">
+                        <div class="form-group">
+                            <label>Estoque Físico Inicial (Unidades):</label>
+                            <input type="number" id="cad-produto-estoque" min="0" value="10" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Alerta de Estoque Mínimo:</label>
+                            <input type="number" id="cad-produto-minimo" min="0" value="2" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-cadastrar">💾 Salvar Produto e Inicializar Estoque</button>
                 </form>
             </div>
 
@@ -470,57 +479,67 @@
                 <ul id="lista-itens" class="lista-itens"></ul>
                 <div>
                     <div class="total-tela">Total: <span>R$ <span id="total-valor">0.00</span></span></div>
-                    <button type="button" class="btn btn-print" style="margin-top: 15px;" onclick="finalizarEImprimirTicket()">🖨️ Fechar Venda e Emitir Cupom</button>
+                    <button type="button" class="btn btn-print" style="margin-top: 15px;" onclick="finalizarEImprimirTicket()">🖨️ Fechar Venda e Deduzir Estoque</button>
                 </div>
             </div>
 
-            <!-- FECHAMENTO DE TURNO -->
+            <!-- FECHAMENTO FINANCEIRO POR PERÍODO SELECIONÁVEL -->
             <div class="card card-fechamento-compacto" id="card-aba-fechamento">
-                <h3>🔒 Fechamento Consolidado de Caixa</h3>
-                <div class="container-botoes-fechamento" style="display: flex; flex-direction: column; gap: 8px;">
-                    <button type="button" class="btn btn-fechamento" onclick="calcularFechamentoDiario()">🔒 Processar Turno Atual</button>
-                    <button type="button" id="btn-pdf-id" class="btn btn-pdf" onclick="exportarFechamentoPDF()">📥 Gerar Relatório PDF (A4)</button>
-                    <button type="button" id="btn-reset-id" class="btn btn-reset" onclick="reiniciarTurnoComSenha()">⚠️ Reiniciar Turno (Zerar Caixa)</button>
+                <h3>📊 Fechamento & Consolidação por Período</h3>
+                
+                <div class="form-row dois-campos" style="margin-bottom: 15px;">
+                    <div class="form-group">
+                        <label>Data Inicial:</label>
+                        <input type="date" id="filtro-data-inicio">
+                    </div>
+                    <div class="form-group">
+                        <label>Data Final:</label>
+                        <input type="date" id="filtro-data-fim">
+                    </div>
+                </div>
+
+                <div class="container-botoes-fechamento" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px;">
+                    <button type="button" class="btn btn-fechamento" onclick="calcularFechamentoPorPeriodo()">🔍 Processar Fechamento do Período</button>
+                    <button type="button" id="btn-pdf-id" class="btn btn-pdf" onclick="exportarFechamentoPDF()">📥 Gerar Relatório PDF Gerencial (A4)</button>
                 </div>
                 
                 <div id="dashboard-vendas-tela" class="dash-container-tela">
                     <div class="bloco-metricas-caixa">
                         <div class="card-metrica">
-                            <h4>Faturamento Bruto Acumulado</h4>
+                            <h4>Faturamento Bruto no Período</h4>
                             <p id="t-dash-faturamento">R$ 0.00</p>
                         </div>
                         <div class="card-metrica">
-                            <h4>Total de Pedidos Processados</h4>
+                            <h4>Vendas Efetuadas</h4>
                             <p id="t-dash-qtd-pedidos">0</p>
                         </div>
                         <div class="card-metrica">
-                            <h4>Ticket Médio do Turno</h4>
+                            <h4>Ticket Médio</h4>
                             <p id="t-dash-ticket-medio">R$ 0.00</p>
                         </div>
                     </div>
                     <div class="bloco-grafico-caixa">
                         <canvas id="graficoPizzaFechamento"></canvas>
                     </div>
-                    <div class="dash-full" style="text-align:center; padding: 5px; font-weight: bold; color: var(--cor-principal); font-size: 13px;">
-                        🎯 Relatório de Suplementos compilado com sucesso!
+                    <div class="dash-full" id="texto-periodo-compilado" style="text-align:center; padding: 5px; font-weight: bold; color: var(--cor-principal); font-size: 13px;">
+                        🎯 Selecione um período acima para compilar o relatório.
                     </div>
                 </div>
             </div>
 
-            <!-- LOGS DE TRANSAÇÕES -->
+            <!-- LOGS DE TRANSAÇÕES GERAIS PERMANENTES -->
             <div class="card" id="card-aba-logs">
-                <h3>📋 Logs Analíticos de Transações (Real-time Firebase)</h3>
+                <h3>📋 Histórico Geral de Transações (Tempo Real)</h3>
                 <div class="tabela-wrapper">
                     <table class="tabela-comercial">
                         <thead>
                             <tr>
-                                <th style="width: 8%;">Nº</th>
-                                <th style="width: 10%;">Hora</th>
-                                <th style="width: 22%;">Cliente</th>
-                                <th style="width: 33%;">Produtos Lançados</th>
+                                <th style="width: 12%;">Data / Hora</th>
+                                <th style="width: 20%;">Cliente</th>
+                                <th style="width: 40%;">Produtos Lançados</th>
                                 <th style="width: 10%;">Método</th>
-                                <th style="width: 8%;">Total</th>
-                                <th style="width: 9%; text-align: center;">Ações</th>
+                                <th style="width: 10%;">Total</th>
+                                <th style="width: 8%; text-align: center;">Ações</th>
                             </tr>
                         </thead>
                         <tbody id="corpo-historico"></tbody>
@@ -534,9 +553,8 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, doc, setDoc, getDoc, query, orderBy, Timestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, setDoc, getDoc, runTransaction, query, orderBy, Timestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-        // Autenticado diretamente no projeto nutri-46260
         const firebaseConfig = {
             apiKey: "AIzaSyCw8CMa3-UoWBxXONoNEOrZ-qprr0hUPN8",
             authDomain: "nutri-46260.firebaseapp.com",
@@ -551,11 +569,14 @@
         const db = getFirestore(app);
 
         let pedidoAtual = [];
-        let historicoGeralPedidos = []; 
-        let contadorPedidos = 1;
+        let todosOsPedidosBanco = []; 
         let dadosFechamentoRelatorio = null;
         let chartPizzaInstancia = null; 
-        let horarioCorteTurno = 0; 
+        let estoqueFisicoDisponivel = 0; // Armazena temporariamente o saldo do EAN ativo no caixa
+
+        const hojeIso = new Date().toISOString().split('T')[0];
+        document.getElementById('filtro-data-inicio').value = hojeIso;
+        document.getElementById('filtro-data-fim').value = hojeIso;
 
         window.alternarAbaMobile = function(abaNome, elementoBtn) {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -576,7 +597,11 @@
             window.scrollTo({ top: 0, behavior: 'instant' });
         };
 
+        // LÓGICA DE AUDITORIA DE ESTOQUE EM TEMPO REAL NO CAIXA
         const inputEanVenda = document.getElementById('venda-codigo-barras');
+        const statusEstoqueIndicator = document.getElementById('venda-estoque-status');
+        const btnInserir = document.getElementById('btn-inserir-checkout');
+
         inputEanVenda.addEventListener('input', async (e) => {
             const codigo = e.target.value.trim();
             if(codigo.length >= 3) {
@@ -585,14 +610,33 @@
                     const docSnap = await getDoc(docRef);
                     if(docSnap.exists()) {
                         const prodData = docSnap.data();
+                        estoqueFisicoDisponivel = parseInt(prodData.estoqueAtual !== undefined ? prodData.estoqueAtual : 0);
+                        const estMinimo = parseInt(prodData.estoqueMinimo || 2);
+
                         document.getElementById('produto-nome').value = prodData.nome;
                         document.getElementById('produto-tipo').value = prodData.tipo;
                         document.getElementById('valor').value = parseFloat(prodData.preco).toFixed(2);
-                        document.getElementById('quantidade').focus();
+                        
+                        // Exibe indicador visual de estoque no caixa
+                        statusEstoqueIndicator.style.display = "block";
+                        if(estoqueFisicoDisponivel <= estMinimo) {
+                            statusEstoqueIndicator.className = "estoque-indicator estoque-baixo";
+                            statusEstoqueIndicator.innerText = `⚠️ Estoque Crítico: Apenas ${estoqueFisicoDisponivel} un. disponíveis!`;
+                        } else {
+                            statusEstoqueIndicator.className = "estoque-indicator estoque-ok";
+                            statusEstoqueIndicator.innerText = `✅ Estoque Regular: ${estoqueFisicoDisponivel} un. disponíveis.`;
+                        }
+
+                        if(estoqueFisicoDisponivel <= 0) {
+                            btnInserir.disabled = true;
+                            btnInserir.innerText = "❌ Produto Esgotado";
+                        } else {
+                            btnInserir.disabled = false;
+                            btnInserir.innerText = "＋ Inserir no Checkout";
+                            document.getElementById('quantidade').focus();
+                        }
                     } else {
-                        document.getElementById('produto-nome').value = '';
-                        document.getElementById('produto-tipo').value = '';
-                        document.getElementById('valor').value = '';
+                        resetaCamposVenda();
                     }
                 } catch (erro) {
                     console.error("Erro ao ler código de barras: ", erro);
@@ -600,6 +644,17 @@
             }
         });
 
+        function resetaCamposVenda() {
+            document.getElementById('produto-nome').value = '';
+            document.getElementById('produto-tipo').value = '';
+            document.getElementById('valor').value = '';
+            statusEstoqueIndicator.style.display = "none";
+            btnInserir.disabled = false;
+            btnInserir.innerText = "＋ Inserir no Checkout";
+            estoqueFisicoDisponivel = 0;
+        }
+
+        // CADASTRO COMPLETO COM DADOS DE ESTOQUE
         const formCadastro = document.getElementById('form-cadastro-produto');
         formCadastro.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -607,15 +662,19 @@
             const nome = document.getElementById('cad-produto-nome').value.trim();
             const tipo = document.getElementById('cad-produto-tipo').value.trim();
             const preco = parseFloat(document.getElementById('cad-produto-valor').value);
+            const estoque = parseInt(document.getElementById('cad-produto-estoque').value);
+            const minimo = parseInt(document.getElementById('cad-produto-minimo').value);
 
             try {
                 await setDoc(doc(db, "produtos", ean), {
                     nome: nome,
                     tipo: tipo,
                     preco: preco,
+                    estoqueAtual: estoque,
+                    estoqueMinimo: minimo,
                     cadastradoEm: Timestamp.now()
                 });
-                alert(`Sucesso! Produto "${nome}" cadastrado.`);
+                alert(`Sucesso! "${nome}" cadastrado com estoque inicial de ${estoque} unidades.`);
                 formCadastro.reset();
                 document.getElementById('cad-codigo-barras').focus();
             } catch (erro) {
@@ -655,83 +714,54 @@
             }
         }
 
-        async function sincronizarHorarioCorteCloud() {
-            try {
-                const docRef = doc(db, "configuracoes", "turno_atual");
-                const docSnap = await getDoc(docRef);
-                if (docSnap.exists()) {
-                    horarioCorteTurno = docSnap.data().horarioCorte || 0;
-                } else {
-                    horarioCorteTurno = 0;
-                }
-            } catch (e) {
-                horarioCorteTurno = localStorage.getItem('horarioCorteTurnoSuple') ? parseInt(localStorage.getItem('horarioCorteTurnoSuple')) : 0;
-            }
-        }
-
         window.validarAcessoSecure = async function(event) {
             event.preventDefault();
             const usuarioInput = document.getElementById('login-usuario').value.trim();
             const senhaInput = document.getElementById('login-senha').value.trim();
             
-            // Usuario: leo | Senha: apollo25 (Hash em Base64: YXBvbGxvMjU=)
             if (usuarioInput.toLowerCase() === "leo" && btoa(senhaInput) === "YXBvbGxvMjU=") {
                 document.getElementById('tela-login').style.display = 'none';
                 document.getElementById('conteudo-sistema').style.display = 'block';
-                await sincronizarHorarioCorteCloud();
-                carregarHistoricoDoFirebase();
+                carregarHistoricoCompleto();
             } else {
                 alert("Usuário ou Senha incorretos!");
                 document.getElementById('login-senha').value = '';
             }
         };
 
-        async function carregarHistoricoDoFirebase() {
+        async function carregarHistoricoCompleto() {
             try {
-                await sincronizarHorarioCorteCloud();
-                const q = query(collection(db, "pedidos"), orderBy("numero", "desc"));
+                const q = query(collection(db, "pedidos"), orderBy("timestamp", "desc"));
                 const querySnapshot = await getDocs(q);
                 
-                historicoGeralPedidos = [];
+                todosOsPedidosBanco = [];
                 const corpoHistorico = document.getElementById('corpo-historico');
                 corpoHistorico.innerHTML = '';
-                
-                let maiorNumeroTurnoAtual = 0;
 
                 querySnapshot.forEach((doc) => {
                     const dados = doc.data();
-                    const milisegundosDoc = dados.timestamp ? dados.timestamp.toMillis() : 0;
+                    dados.firebaseId = doc.id;
+                    todosOsPedidosBanco.push(dados);
 
-                    if (milisegundosDoc > horarioCorteTurno) {
-                        dados.firebaseId = doc.id;
-                        historicoGeralPedidos.push(dados);
-                        
-                        if (dados.numero > maiorNumeroTurnoAtual) {
-                            maiorNumeroTurnoAtual = dados.numero;
-                        }
-
-                        let resumoItens = dados.itens.map(i => {
-                            return `<span style="color:var(--cor-principal); font-weight:600;">(${i.qtd}x) ${i.prato}</span> - <small>${i.tipo}</small>`;
-                        }).join('<br>');
-                        
-                        corpoHistorico.innerHTML += `
-                            <tr>
-                                <td><strong style="color:var(--cor-principal)">#${String(dados.numero).padStart(2, '0')}</strong></td>
-                                <td>${dados.hora || '00:00'}</td>
-                                <td>${dados.clienteHtml || 'Consumidor Final'}</td>
-                                <td>${resumoItens}</td>
-                                <td><span style="font-size:11px; font-weight:700; padding:4px 8px; background:#334155; border-radius:6px; color:#fff;">${dados.pagamento}</span></td>
-                                <td><strong>R$ ${parseFloat(dados.total || 0).toFixed(2)}</strong></td>
-                                <td style="text-align:center;"><button class="btn-reprint" onclick="reimprimirTicketPorId('${doc.id}')">🖨️ Reimp</button></td>
-                            </tr>
-                        `;
-                    }
+                    let resumoItens = dados.itens.map(i => {
+                        return `<span style="color:var(--cor-principal); font-weight:600;">(${i.qtd}x) ${i.prato}</span> - <small>${i.tipo}</small>`;
+                    }).join('<br>');
+                    
+                    corpoHistorico.innerHTML += `
+                        <tr>
+                            <td><strong>${dados.data.split(' ')[0]}</strong><br><small style="color:var(--cor-texto-secundario)">${dados.hora}</small></td>
+                            <td>${dados.clienteHtml || '<span style="color:var(--cor-texto-secundario)">Consumidor Final</span>'}</td>
+                            <td>${resumoItens}</td>
+                            <td><span style="font-size:11px; font-weight:700; padding:4px 8px; background:#334155; border-radius:6px; color:#fff;">${dados.pagamento}</span></td>
+                            <td><strong>R$ ${parseFloat(dados.total || 0).toFixed(2)}</strong></td>
+                            <td style="text-align:center;"><button class="btn-reprint" onclick="reimprimirTicketPorId('${doc.id}')">🖨️ Ver</button></td>
+                        </tr>
+                    `;
                 });
-                
-                contadorPedidos = maiorNumeroTurnoAtual + 1;
-                historicoGeralPedidos.reverse();
+
+                calcularFechamentoPorPeriodo();
             } catch (erro) {
-                console.error("Erro Firebase ao carregar logs: ", erro);
+                console.error("Erro ao carregar histórico: ", erro);
             }
         }
 
@@ -743,6 +773,12 @@
             const precoUnitario = parseFloat(document.getElementById('valor').value);
             const qtd = parseInt(document.getElementById('quantidade').value);
             const pagamento = document.getElementById('forma-pagamento').value;
+
+            // Bloqueio extra para impedir inserção caso mude a quantidade manualmente acima do estoque ativo
+            if(qtd > estoqueFisicoDisponivel) {
+                alert(`Erro de Saldo! Você está tentando vender ${qtd} unidades, mas existem apenas ${estoqueFisicoDisponivel} unidades desse suplemento em estoque.`);
+                return;
+            }
 
             const subtotalItem = precoUnitario * qtd;
 
@@ -758,12 +794,7 @@
             });
             
             atualizarInterface();
-
-            document.getElementById('venda-codigo-barras').value = '';
-            document.getElementById('produto-nome').value = '';
-            document.getElementById('produto-tipo').value = '';
-            document.getElementById('valor').value = '';
-            document.getElementById('quantidade').value = '1';
+            resetaCamposVenda();
             document.getElementById('venda-codigo-barras').focus();
         };
 
@@ -820,7 +851,7 @@
                         <div class="ticket-via-tag">--- VIA: ${nomeVia} ---</div><br><br>
                         <span class="ticket-header-title">POWER NUTRI SUPLEMENTOS</span>
                         <div class="ticket-divider">--------------------------------</div>
-                        <span class="ticket-header-num-destaque">COMPRA #${String(pedido.numero).padStart(2, '0')}</span>
+                        <div style="font-size: 11px; font-weight: bold;">CUPOM DE VENDA</div>
                         <div class="ticket-divider">--------------------------------</div>
                         <div style="font-size: 9px;">DATA: ${pedido.data}</div>
                     </div>
@@ -844,16 +875,17 @@
         }
 
         window.reimprimirTicketPorId = function(firebaseId) {
-            const pedidoMestre = historicoGeralPedidos.find(p => p.firebaseId === firebaseId);
+            const pedidoMestre = todosOsPedidosBanco.find(p => p.firebaseId === firebaseId);
             if (!pedidoMestre) {
-                alert("Pedido não localizado.");
+                alert("Venda não localizada.");
                 return;
             }
             const containerFita = document.getElementById('ticket-print');
-            containerFita.innerHTML = gerarHtmlFitaVia(pedidoMestre, "BALCÃO") + gerarHtmlFitaVia(pedidoMestre, "CLIENTE");
+            containerFita.innerHTML = gerarHtmlFitaVia(pedidoMestre, "RELAÇÃO") + gerarHtmlFitaVia(pedidoMestre, "VIA CLIENTE");
             window.print();
         };
 
+        // FECHAMENTO DA VENDA COM CRIAÇÃO DE TRANSAÇÃO ATÔMICA DA NUVEM (DEDUÇÃO SEGURA DE ESTOQUE)
         window.finalizarEImprimirTicket = async function() {
             if (pedidoAtual.length === 0) {
                 alert("Nenhum item lançado no checkout!");
@@ -895,7 +927,6 @@
             });
 
             const documentoPedido = {
-                numero: contadorPedidos,
                 data: dataFormatada,
                 hora: horaSimples,
                 clienteHtml: stringClienteHistorico,
@@ -908,12 +939,43 @@
             };
 
             try {
-                await addDoc(collection(db, "pedidos"), documentoPedido);
-                
-                const containerFita = document.getElementById('ticket-print');
-                containerFita.innerHTML = gerarHtmlFitaVia(documentoPedido, "CAIXA") + gerarHtmlFitaVia(documentoPedido, "CLIENTE");
+                // EXECUÇÃO DA TRANSAÇÃO DA NUVEM - ANTI CONCORRÊNCIA E QUEBRA DE ESTOQUE
+                await runTransaction(db, async (transaction) => {
+                    // Passo 1: Validar se todos os produtos possuem o saldo em estoque na nuvem antes de baixar
+                    const leiturasDeProdutos = [];
+                    for (const item of pedidoAtual) {
+                        const pRef = doc(db, "produtos", item.ean);
+                        leiturasDeProdutos.push({ ref: pRef, doc: await transaction.get(pRef), item: item });
+                    }
 
-                await carregarHistoricoDoFirebase();
+                    // Passo 2: Validar e Subtrair saldo de cada item de forma atômica
+                    for (const obj of leiturasDeProdutos) {
+                        if (!obj.doc.exists()) {
+                            throw `Produto com código ${obj.item.ean} não localizado no banco de dados!`;
+                        }
+                        const estoqueAtualBanco = parseInt(obj.doc.data().estoqueAtual || 0);
+                        const quantidadeVendida = parseInt(obj.item.qtd);
+
+                        if (estoqueAtualBanco < quantidadeVendida) {
+                            throw `Saldo Insuficiente de última hora para o item: "${obj.item.prato}". Disponível no estoque: ${estoqueAtualBanco} un.`;
+                        }
+
+                        // Atualiza direto no fluxo bloqueado da nuvem
+                        transaction.update(obj.ref, {
+                            estoqueAtual: estoqueAtualBanco - quantidadeVendida
+                        });
+                    }
+
+                    // Passo 3: Inserir a venda em si
+                    const novoPedidoRef = doc(collection(db, "pedidos"));
+                    transaction.set(novoPedidoRef, documentoPedido);
+                });
+
+                // Impressão e limpeza de fluxo se a transação atômica passar
+                const containerFita = document.getElementById('ticket-print');
+                containerFita.innerHTML = gerarHtmlFitaVia(documentoPedido, "EMISSÃO") + gerarHtmlFitaVia(documentoPedido, "VIA CLIENTE");
+
+                await carregarHistoricoCompleto();
                 window.print();
 
                 pedidoAtual = [];
@@ -925,23 +987,31 @@
                     alternarAbaMobile('venda', document.querySelector('.mobile-tabs-nav .tab-btn:first-child'));
                 }
             } catch (erro) {
-                alert("Erro ao conectar com o Firebase!");
+                alert(`Erro Crítico na Venda:\n${erro}`);
                 console.error(erro);
             }
         };
 
-        window.calcularFechamentoDiario = function() {
-            if (historicoGeralPedidos.length === 0) {
-                alert("Não existem vendas registradas no turno atual.");
-                return;
-            }
+        window.calcularFechamentoPorPeriodo = function() {
+            const dataInicioStr = document.getElementById('filtro-data-inicio').value;
+            const dataFimStr = document.getElementById('filtro-data-fim').value;
+
+            if(!dataInicioStr || !dataFimStr) return;
+
+            const dataInicio = new Date(dataInicioStr + "T00:00:00");
+            const dataFim = new Date(dataFimStr + "T23:59:59");
+
+            const pedidosFiltrados = todosOsPedidosBanco.filter(p => {
+                const pMillis = p.timestamp ? p.timestamp.toMillis() : 0;
+                return pMillis >= dataInicio.getTime() && pMillis <= dataFim.getTime();
+            });
 
             let faturamentoTotal = 0;
             let totalItens = 0;
             let faturamentoPorPrato = {};
             let faturamentoPorMetodoPagamento = { "Pix": 0, "Cartão": 0, "Dinheiro": 0 };
 
-            historicoGeralPedidos.forEach(p => {
+            pedidosFiltrados.forEach(p => {
                 let totalPedidoMatematico = parseFloat(p.total || 0);
                 faturamentoTotal += totalPedidoMatematico;
                 
@@ -958,23 +1028,24 @@
                 });
             });
 
-            let ticketMedio = faturamentoTotal / historicoGeralPedidos.length;
-            const agora = new Date();
-            const dataHoraString = `Emissão: ${agora.toLocaleDateString('pt-BR')} às ${agora.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'})}`;
-
+            let ticketMedio = pedidosFiltrados.length > 0 ? (faturamentoTotal / pedidosFiltrados.length) : 0;
+            
             document.getElementById('t-dash-faturamento').innerText = 'R$ ' + faturamentoTotal.toFixed(2);
-            document.getElementById('t-dash-qtd-pedidos').innerText = historicoGeralPedidos.length + ` (${totalItens} un)`;
+            document.getElementById('t-dash-qtd-pedidos').innerText = pedidosFiltrados.length + ` vendas (${totalItens} un)`;
             document.getElementById('t-dash-ticket-medio').innerText = 'R$ ' + ticketMedio.toFixed(2);
             
-            document.getElementById('dashboard-vendas-tela').style.display = 'grid';
+            const dIniForm = dataInicio.toLocaleDateString('pt-BR');
+            const dFimForm = dataFim.toLocaleDateString('pt-BR');
+            document.getElementById('texto-periodo-compilado').innerText = `📊 Compilado de: ${dIniForm} até ${dFimForm}`;
 
             dadosFechamentoRelatorio = {
-                dataHora: dataHoraString,
+                periodoTexto: `${dIniForm} a ${dFimForm}`,
                 faturamento: 'R$ ' + faturamentoTotal.toFixed(2),
-                pedidos: historicoGeralPedidos.length + ` vendas (${totalItens} unidades)`,
+                pedidos: pedidosFiltrados.length + ` vendas (${totalItens} unidades)`,
                 ticket: 'R$ ' + ticketMedio.toFixed(2),
                 porCategoria: faturamentoPorPrato,
-                porPagamento: faturamentoPorMetodoPagamento
+                porPagamento: faturamentoPorMetodoPagamento,
+                listaFiltrada: pedidosFiltrados
             };
 
             const ctxPizza = document.getElementById('graficoPizzaFechamento').getContext('2d');
@@ -983,9 +1054,9 @@
             chartPizzaInstancia = new Chart(ctxPizza, {
                 type: 'pie',
                 data: {
-                    labels: Object.keys(faturamentoPorPrato),
+                    labels: Object.keys(faturamentoPorPrato).length > 0 ? Object.keys(faturamentoPorPrato) : ["Nenhum produto"],
                     datasets: [{
-                        data: Object.values(faturamentoPorPrato),
+                        data: Object.values(faturamentoPorPrato).length > 0 ? Object.values(faturamentoPorPrato) : [0],
                         backgroundColor: ['#f97316', '#3b82f6', '#10b981', '#a855f7', '#eab308', '#ec4899', '#6366f1']
                     }]
                 },
@@ -997,9 +1068,6 @@
                     }
                 }
             });
-
-            document.getElementById('btn-pdf-id').style.display = 'flex';
-            document.getElementById('btn-reset-id').style.display = 'flex';
         };
 
         window.exportarFechamentoPDF = function() {
@@ -1013,14 +1081,14 @@
             iframeDoc.open();
 
             let tabelaPedidosHtml = '';
-            historicoGeralPedidos.forEach(p => {
+            dadosFechamentoRelatorio.listaFiltrada.forEach((p, idx) => {
                 tabelaPedidosHtml += `
                     <tr>
-                        <td style="padding: 10px 8px; border-bottom: 1px solid #334155;"><strong>#${String(p.numero).padStart(2, '0')}</strong><br>${p.hora}</td>
-                        <td style="padding: 10px 8px; border-bottom: 1px solid #334155;">${p.clienteA4}</td>
-                        <td style="padding: 10px 8px; border-bottom: 1px solid #334155;">${p.itensTxt}</td>
-                        <td style="padding: 10px 8px; border-bottom: 1px solid #334155; text-align:center;">${p.pagamento}</td>
-                        <td style="padding: 10px 8px; border-bottom: 1px solid #334155; text-align:right;"><strong>R$ ${parseFloat(p.total).toFixed(2)}</strong></td>
+                        <td style="padding: 10px 8px; border-bottom: 1px solid #e2e8f0;"><strong>#${idx + 1}</strong><br><small>${p.data}</small></td>
+                        <td style="padding: 10px 8px; border-bottom: 1px solid #e2e8f0;">${p.clienteA4}</td>
+                        <td style="padding: 10px 8px; border-bottom: 1px solid #e2e8f0;">${p.itensTxt}</td>
+                        <td style="padding: 10px 8px; border-bottom: 1px solid #e2e8f0; text-align:center;">${p.pagamento}</td>
+                        <td style="padding: 10px 8px; border-bottom: 1px solid #e2e8f0; text-align:right;"><strong>R$ ${parseFloat(p.total).toFixed(2)}</strong></td>
                     </tr>`;
             });
 
@@ -1029,33 +1097,45 @@
                 stringMeiosPagamentoHtml += `<tr><td style="padding: 10px 12px; border-bottom: 1px solid #e2e8f0;">⚡ ${metodo}</td><td style="padding: 10px 12px; border-bottom: 1px solid #e2e8f0; text-align:right; font-weight:bold;">R$ ${valor.toFixed(2)}</td></tr>`;
             }
 
+            let stringProdutosHtml = '';
+            for (const [prod, valor] of Object.entries(dadosFechamentoRelatorio.porCategoria)) {
+                stringProdutosHtml += `<tr><td style="padding: 10px 12px; border-bottom: 1px solid #e2e8f0;">📦 ${prod}</td><td style="padding: 10px 12px; border-bottom: 1px solid #e2e8f0; text-align:right; font-weight:bold;">R$ ${valor.toFixed(2)}</td></tr>`;
+            }
+
             iframeDoc.write(`
                 <html>
                 <head>
                     <style>
-                        body { padding: 20px; font-family: Arial, sans-serif; color: #0f172a; }
-                        .header { border-bottom: 4px solid #f97316; padding-bottom: 10px; margin-bottom: 20px; }
-                        .section-title { font-weight: bold; background: #f1f5f9; padding: 8px; margin-top: 20px; border-left: 4px solid #f97316; text-transform: uppercase; font-size:12px;}
+                        body { padding: 25px; font-family: Arial, sans-serif; color: #0f172a; background: #ffffff; }
+                        .header { border-bottom: 4px solid #f97316; padding-bottom: 12px; margin-bottom: 20px; }
+                        .section-title { font-weight: bold; background: #f8fafc; padding: 8px; margin-top: 22px; border-left: 4px solid #f97316; text-transform: uppercase; font-size:11px; letter-spacing: 0.5px;}
                         table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size:12px; }
-                        th { background: #f8fafc; padding: 8px; text-align: left; border-bottom: 2px solid #cbd5e1; }
+                        th { background: #f1f5f9; padding: 8px; text-align: left; border-bottom: 2px solid #cbd5e1; font-weight:700; text-transform:uppercase; font-size:10px; }
+                        td { padding: 8px; border-bottom: 1px solid #e2e8f0; }
                     </style>
                 </head>
                 <body>
                     <div class="header">
-                        <h2>PowerNutri Suplementos - Relatório de Turno</h2>
-                        <div>${dadosFechamentoRelatorio.dataHora}</div>
+                        <h2 style="margin:0; color:#f97316;">PowerNutri — Relatório de Fechamento Consolidado</h2>
+                        <div style="font-size:13px; color:#64748b; margin-top:4px;">Período Auditado: <strong>${dadosFechamentoRelatorio.periodoTexto}</strong></div>
                     </div>
-                    <div class="section-title">Resumo Gerencial</div>
+                    
+                    <div class="section-title">Indicadores Gerais Financeiros</div>
                     <table>
-                        <tr><td>Faturamento Bruto:</td><td><strong>${dadosFechamentoRelatorio.faturamento}</strong></td></tr>
-                        <tr><td>Volume Atendido:</td><td>${dadosFechamentoRelatorio.pedidos}</td></tr>
-                        <tr><td>Ticket Médio:</td><td>${dadosFechamentoRelatorio.ticket}</td></tr>
+                        <tr><td>Faturamento Bruto Consolidado:</td><td><strong style="color:#ea580c; font-size:14px;">${dadosFechamentoRelatorio.faturamento}</strong></td></tr>
+                        <tr><td>Volume de Transações do Período:</td><td><strong>${dadosFechamentoRelatorio.pedidos}</strong></td></tr>
+                        <tr><td>Ticket Médio do Período:</td><td><strong>${dadosFechamentoRelatorio.ticket}</strong></td></tr>
                     </table>
-                    <div class="section-title">Meios de Pagamento</div>
+
+                    <div class="section-title">Faturamento por Meios de Captura</div>
                     <table>${stringMeiosPagamentoHtml}</table>
-                    <div class="section-title">Transações Analíticas</div>
+
+                    <div class="section-title">Análise Volumétrica por Produto</div>
+                    <table>${stringProdutosHtml}</table>
+
+                    <div class="section-title">Movimentações Analíticas do Período</div>
                     <table>
-                        <thead><tr><th>Ref/Hora</th><th>Cliente</th><th>Itens</th><th>Forma</th><th>Total</th></tr></thead>
+                        <thead><tr><th>Ref/Data</th><th>Cliente</th><th>Produtos</th><th>Forma</th><th>Total</th></tr></thead>
                         <tbody>${tabelaPedidosHtml}</tbody>
                     </table>
                 </body>
@@ -1065,7 +1145,7 @@
 
             const configuracoes = {
                 margin: [15, 14, 15, 14],
-                filename: `Fechamento_PowerNutri_${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.pdf`,
+                filename: `Fechamento_Auditoria_PowerNutri_${dadosFechamentoRelatorio.periodoTexto.replace(/ /g, '')}.pdf`,
                 image: { type: 'jpeg', quality: 1.0 },
                 html2canvas: { scale: 2, width: 790 },
                 jsPDF: { format: 'a4', orientation: 'portrait' }
@@ -1074,40 +1154,6 @@
             html2pdf().set(configuracoes).from(iframeDoc.body).save().then(() => {
                 iframePDF.remove();
             });
-        };
-
-        window.reiniciarTurnoComSenha = async function() {
-            const senhaDigitada = prompt("Para zerar o caixa e iniciar o próximo turno, digite a senha master:");
-            if (senhaDigitada === "1234") {
-                const novoHorarioCorte = Date.now();
-                
-                try {
-                    await setDoc(doc(db, "configuracoes", "turno_atual"), {
-                        horarioCorte: novoHorarioCorte,
-                        atualizadoPor: "leo",
-                        timestamp: Timestamp.now()
-                    });
-                    
-                    localStorage.setItem('horarioCorteTurnoSuple', novoHorarioCorte);
-                    horarioCorteTurno = novoHorarioCorte;
-
-                    historicoGeralPedidos = [];
-                    contadorPedidos = 1;
-                    dadosFechamentoRelatorio = null;
-                    
-                    document.getElementById('corpo-historico').innerHTML = ''; 
-                    document.getElementById('dashboard-vendas-tela').style.display = 'none';
-                    document.getElementById('btn-pdf-id').style.display = 'none';
-                    document.getElementById('btn-reset-id').style.display = 'none';
-                    
-                    alert("Turno encerrado globalmente.");
-                    await carregarHistoricoDoFirebase();
-                } catch(e) {
-                    alert("Erro de conexão.");
-                }
-            } else if (senhaDigitada !== null) {
-                alert("Senha incorreta!");
-            }
         };
     </script>
 </body>
