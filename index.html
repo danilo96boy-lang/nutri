@@ -1,0 +1,1120 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PowerNutri - PDV e Controle de Suplementos</title>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        /* ==========================================================================
+           --- DESIGN SYSTEM FITNESS E INTERFACE OPERACIONAL PREMIUM ---
+           ========================================================================== */
+        :root {
+            --cor-principal: #f97316; /* Laranja Fitness / Energético */
+            --cor-principal-hover: #ea580c;
+            --cor-fundo: #0f172a; /* Slate Escuro Premium */
+            --cor-card: #1e293b;
+            --cor-texto: #f8fafc;
+            --cor-texto-secundario: #94a3b8;
+            --cor-borda: #334155;
+            --border-radius-lg: 12px;
+            --border-radius-md: 8px;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.2);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.3);
+            --transition: all 0.2s ease-in-out;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--cor-fundo);
+            margin: 0;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--cor-texto);
+            -webkit-font-smoothing: antialiased;
+            padding-bottom: 70px;
+        }
+
+        @media(min-width: 950px) {
+            body { padding: 20px; padding-bottom: 20px; }
+        }
+
+        #tela-login {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: var(--cor-fundo);
+            z-index: 9999;
+            padding: 16px;
+            box-sizing: border-box;
+        }
+
+        .card-login {
+            background: var(--cor-card);
+            padding: 30px 20px;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-md);
+            width: 100%;
+            max-width: 380px;
+            box-sizing: border-box;
+            text-align: center;
+            border-top: 5px solid var(--cor-principal);
+        }
+
+        #conteudo-sistema {
+            display: none;
+            width: 100%;
+            max-width: 1280px;
+        }
+
+        .brand-header {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 12px;
+            background: var(--cor-card);
+            padding: 12px 16px;
+            border-radius: var(--border-radius-lg);
+            width: 100%;
+            box-shadow: var(--shadow-sm);
+            box-sizing: border-box;
+            border: 1px solid var(--cor-borda);
+            margin-bottom: 12px;
+        }
+
+        .brand-logo {
+            width: 40px;
+            height: 40px;
+            object-fit: cover;
+            border-radius: var(--border-radius-md);
+            border: 2px solid var(--cor-principal);
+        }
+
+        .brand-header h1 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--cor-texto);
+            letter-spacing: -0.5px;
+        }
+
+        @media(min-width: 950px) {
+            .brand-header { gap: 16px; padding: 16px 28px; margin-bottom: 20px; }
+            .brand-header h1 { font-size: 22px; }
+        }
+
+        .mobile-tabs-nav {
+            display: flex;
+            justify-content: space-around;
+            position: fixed;
+            bottom: 0; left: 0; width: 100%;
+            background: var(--cor-card);
+            border-top: 1px solid var(--cor-borda);
+            padding: 10px 0;
+            z-index: 999;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.3);
+        }
+
+        .tab-btn {
+            background: none; border: none; font-size: 11px; font-weight: 700;
+            color: var(--cor-texto-secundario); display: flex; flex-direction: column;
+            align-items: center; gap: 4px; cursor: pointer; position: relative; width: 20%;
+        }
+
+        .tab-btn.active { color: var(--cor-principal); }
+        
+        .badge-carrinho {
+            position: absolute; top: -6px; right: 22%;
+            background: var(--cor-principal); color: white;
+            font-size: 10px; font-weight: bold; border-radius: 10px;
+            padding: 1px 6px; display: none;
+        }
+
+        @media(min-width: 950px) {
+            .mobile-tabs-nav { display: none !important; }
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        @media(max-width: 949px) {
+            .main-grid > .card { display: none; }
+            .main-grid > .card.active-tab-card { display: block !important; }
+        }
+
+        @media(min-width: 950px) {
+            .main-grid { grid-template-columns: 1.2fr 1fr; gap: 20px; }
+            .full-width-grid { grid-column: span 2; }
+            .main-grid > .card { display: block !important; }
+        }
+
+        .card {
+            background-color: var(--cor-card);
+            padding: 16px;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--cor-borda);
+            box-sizing: border-box;
+            margin-bottom: 16px;
+        }
+
+        @media(min-width: 768px) {
+            .card { padding: 24px; }
+        }
+
+        h3 {
+            margin: 0 0 16px 0;
+            color: var(--cor-texto);
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid var(--cor-borda);
+            padding-bottom: 8px;
+        }
+
+        .secao-titulo {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--cor-principal);
+            margin: 14px 0 8px 0;
+            font-weight: 700;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        @media(min-width: 480px) {
+            .form-row.dois-campos { grid-template-columns: 1fr 1fr; }
+            .form-row.tres-campos { grid-template-columns: 1fr 1fr 1fr; }
+        }
+
+        .form-group { margin-bottom: 10px; }
+
+        label {
+            display: block;
+            margin-bottom: 4px;
+            font-weight: 600;
+            color: var(--cor-texto-secundario);
+            font-size: 12px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px; 
+            border: 1px solid var(--cor-borda);
+            border-radius: var(--border-radius-md);
+            box-sizing: border-box;
+            font-size: 16px; 
+            font-family: inherit;
+            background-color: #0f172a;
+            color: var(--cor-texto);
+            transition: var(--transition);
+        }
+
+        @media(min-width: 950px) {
+            input, select, textarea { font-size: 14px; padding: 10px 12px; }
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--cor-principal);
+            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1.5);
+        }
+
+        .btn {
+            border: none;
+            padding: 14px 20px;
+            font-size: 14px;
+            border-radius: var(--border-radius-md);
+            cursor: pointer;
+            font-weight: 700;
+            transition: var(--transition);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+        }
+
+        @media(min-width: 950px) {
+            .btn { width: auto; padding: 10px 20px; }
+        }
+
+        .btn-add { background-color: var(--cor-principal); color: white; margin-top: 10px; }
+        .btn-add:hover { background-color: var(--cor-principal-hover); }
+
+        .btn-cadastrar { background-color: #475569; color: white; margin-top: 10px; }
+        .btn-cadastrar:hover { background-color: #334155; }
+
+        .btn-print { background-color: #16a34a; color: white; font-size: 15px; }
+        .btn-print:hover { background-color: #15803d; }
+
+        .btn-reprint { background-color: #2563eb; color: white; padding: 8px 12px; font-size: 11px; border-radius: 6px; font-weight: bold; border: none; width: auto; }
+
+        .btn-fechamento { background-color: #64748b; color: white; width: 100%; }
+        .btn-fechamento:hover { background-color: #475569; }
+
+        .btn-pdf { background-color: #2563eb; color: white; display: none; width: 100%; }
+        .btn-pdf:hover { background-color: #1d4ed8; }
+
+        .btn-reset { background-color: #dc2626; color: white; display: none; width: 100%; }
+        .btn-reset:hover { background-color: #b91c1c; }
+
+        @media(min-width: 480px) {
+            .container-botoes-fechamento { display: flex; gap: 10px; width: 100%; justify-content: flex-end; }
+            .card-fechamento-compacto .btn { width: auto; }
+        }
+
+        .carrinho-container { display: flex; flex-direction: column; justify-content: space-between; background: #1e293b; }
+
+        .lista-itens { list-style: none; padding: 0; margin: 0; max-height: 340px; overflow-y: auto; }
+
+        .item-carrinho {
+            background: #0f172a; padding: 12px; margin-bottom: 8px;
+            border-radius: var(--border-radius-md); font-size: 13px; display: flex;
+            justify-content: space-between; align-items: center; border: 1px solid var(--cor-borda);
+        }
+
+        .btn-del {
+            background: #7f1d1d; color: #fca5a5; border: none; border-radius: 50%;
+            width: 24px; height: 24px; font-weight: bold; cursor: pointer; display: flex;
+            align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0;
+        }
+
+        .total-tela { font-size: 24px; font-weight: 800; text-align: right; margin-top: 14px; padding-top: 14px; border-top: 2px dashed var(--cor-borda); }
+        .total-tela span { color: var(--cor-principal); }
+
+        .tabela-wrapper { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: var(--border-radius-md); border: 1px solid var(--cor-borda); }
+        .tabela-comercial { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 650px; }
+        .tabela-comercial th, .tabela-comercial td { padding: 12px 14px; text-align: left; border-bottom: 1px solid var(--cor-borda); vertical-align: top; }
+        .tabela-comercial th { background-color: #0f172a; color: var(--cor-texto-secundario); font-weight: 700; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; }
+
+        .dash-container-tela { display: none; grid-template-columns: 1fr; gap: 16px; margin-top: 15px; padding: 12px; background: #0f172a; border: 1px solid var(--cor-borda); border-radius: var(--border-radius-lg); }
+        @media(min-width: 650px) { .dash-container-tela { grid-template-columns: 1fr 1fr; padding: 15px; } .dash-full { grid-column: span 2; } }
+        .bloco-metricas-caixa { display: flex; flex-direction: column; gap: 10px; }
+        .card-metrica { background: var(--cor-card); border: 1px solid var(--cor-borda); padding: 14px; border-radius: var(--border-radius-md); box-shadow: var(--shadow-sm); }
+        .card-metrica h4 { margin: 0; color: var(--cor-texto-secundario); font-size: 11px; text-transform: uppercase; }
+        .card-metrica p { margin: 4px 0 0 0; font-size: 20px; font-weight: bold; color: var(--cor-texto); }
+        .bloco-grafico-caixa { background: var(--cor-card); border: 1px solid var(--cor-borda); padding: 14px; border-radius: var(--border-radius-md); display: flex; justify-content: center; align-items: center; min-height: 220px; max-height: 260px; box-shadow: var(--shadow-sm); }
+
+        /* Estilos específicos para impressão térmica */
+        @media print {
+            @page { size: 58mm auto; margin: 0mm; }
+            .no-print { display: none !important; }
+            body { background: #fff; padding: 0; margin: 0; display: block; width: 58mm; }
+            #ticket-print { display: block !important; font-family: 'Courier New', Courier, monospace; width: 48mm; max-width: 48mm; padding: 1mm 0.5mm; margin: 0; font-size: 11px; color: #000; line-height: 1.25; word-wrap: break-word; }
+            .ticket-header { text-align: center; margin-bottom: 2px; }
+            .ticket-via-tag { font-size: 11px; font-weight: bold; border: 1px solid #000; display: inline-block; padding: 1px 3px; text-transform: uppercase; }
+            .ticket-header-title { font-size: 14px; font-weight: bold; }
+            .ticket-header-num-destaque { font-size: 22px !important; font-weight: bold !important; margin: 4px 0 !important; text-align: center !important; display: block !important; }
+            .ticket-divider { text-align: center; margin: 2px 0; font-weight: bold; }
+            .ticket-client-info { font-size: 10px; margin-bottom: 2px; }
+            .ticket-item { margin: 4px 0; page-break-inside: avoid; border-bottom: 1px dotted #ccc; padding-bottom: 2px; }
+            .ticket-item-name { display: block; font-weight: bold; }
+            .ticket-item-price { display: block; text-align: right; }
+            .ticket-total-container { font-size: 12px; font-weight: bold; display: flex; justify-content: space-between; }
+            .ticket-wrapper-via { page-break-after: always !important; display: block; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="tela-login" class="no-print">
+        <div class="card-login">
+            <h2 style="color: var(--cor-principal); margin: 0 0 6px 0; text-transform: uppercase; font-size: 20px; font-weight: 800; letter-spacing: 0.5px;">PowerNutri Cloud</h2>
+            <p style="font-size: 13px; color: var(--cor-texto-secundario); margin: 0 0 24px 0;">Painel PDV e Gestão de Suplementos</p>
+            
+            <form id="form-login-id" onsubmit="validarAcessoSecure(event)">
+                <div class="form-group" style="text-align: left;">
+                    <label>Operador / Usuário:</label>
+                    <input type="text" id="login-usuario" required placeholder="Operador">
+                </div>
+                <div class="form-group" style="text-align: left; margin-bottom: 24px;">
+                    <label>Senha de Acesso:</label>
+                    <input type="password" id="login-senha" required placeholder="•••••">
+                </div>
+                <button type="submit" class="btn btn-add">⚡ Abrir Caixa</button>
+            </form>
+        </div>
+    </div>
+
+    <nav class="mobile-tabs-nav no-print" id="navegacao-abas-id">
+        <button class="tab-btn active" onclick="alternarAbaMobile('venda', this)">📝 <span>Caixa</span></button>
+        <button class="tab-btn" onclick="alternarAbaMobile('cadastro', this)">📦 <span>Cadastrar</span></button>
+        <button class="tab-btn" onclick="alternarAbaMobile('carrinho', this)">
+            🛒 <span>Pedido</span>
+            <span class="badge-carrinho" id="badge-contador-id">0</span>
+        </button>
+        <button class="tab-btn" onclick="alternarAbaMobile('fechamento', this)">🔒 <span>Turno</span></button>
+        <button class="tab-btn" onclick="alternarAbaMobile('logs', this)">📋 <span>Logs</span></button>
+    </nav>
+
+    <div id="conteudo-sistema">
+        <div class="brand-header no-print">
+            <div style="background: var(--cor-principal); padding: 6px; border-radius: var(--border-radius-md); font-weight: 900; color: #fff;">PN</div>
+            <h1>PowerNutri — Suplementação Esportiva</h1>
+        </div>
+
+        <div class="main-grid no-print">
+            
+            <div class="card active-tab-card" id="card-aba-venda">
+                <h3>📝 Frente de Caixa (PDV)</h3>
+                <form id="form-item" onsubmit="adicionarItem(event)">
+                    
+                    <div class="secao-titulo">1. Código de Barras (EAN)</div>
+                    <div class="form-group">
+                        <label>Bipar ou Digitar Código de Barras:</label>
+                        <input type="text" id="venda-codigo-barras" placeholder="Passe o leitor de código de barras ou digite..." autofocus>
+                    </div>
+
+                    <div class="secao-titulo">2. Dados do Produto</div>
+                    <div class="form-row dois-campos">
+                        <div class="form-group">
+                            <label>Nome do Produto:</label>
+                            <input type="text" id="produto-nome" placeholder="Busca automática..." readonly required>
+                        </div>
+                        <div class="form-group">
+                            <label>Tamanho / Sabor / Variação:</label>
+                            <input type="text" id="produto-tipo" placeholder="Ex: 900g - Morango" readonly>
+                        </div>
+                    </div>
+
+                    <div class="form-row tres-campos">
+                        <div class="form-group">
+                            <label>Preço Unitário (R$):</label>
+                            <input type="number" id="valor" step="0.01" min="0" placeholder="0,00" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Quantidade:</label>
+                            <input type="number" id="quantidade" min="1" value="1" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Forma de Pagamento:</label>
+                            <select id="forma-pagamento" required>
+                                <option value="Pix">⚡ Pix</option>
+                                <option value="Cartão">💳 Cartão de Crédito/Débito</option>
+                                <option value="Dinheiro">💵 Dinheiro</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="secao-titulo">3. Identificação do Cliente (Opcional)</div>
+                    <div class="form-row dois-campos">
+                        <div class="form-group">
+                            <label>WhatsApp / Celular:</label>
+                            <input type="tel" id="cliente-celular" oninput="buscarClientePorTelefone(this.value)" placeholder="(00) 00000-0000">
+                        </div>
+                        <div class="form-group">
+                            <label>Nome do Cliente:</label>
+                            <input type="text" id="cliente-nome" placeholder="Nome para o histórico de compras">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-add">＋ Inserir no Checkout</button>
+                </form>
+            </div>
+
+            <div class="card" id="card-aba-cadastro">
+                <h3>📦 Cadastrar Produto no Banco de Dados</h3>
+                <form id="form-cadastro-produto">
+                    <div class="form-group">
+                        <label>Código de Barras da Embalagem (Bipar aqui):</label>
+                        <input type="text" id="cad-codigo-barras" placeholder="Bipe o código impresso no pote/embalagem" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Nome do Suplemento:</label>
+                        <input type="text" id="cad-produto-nome" placeholder="Ex: 100% Whey Prime - Growth" required>
+                    </div>
+                    <div class="form-row dois-campos">
+                        <div class="form-group">
+                            <label>Variação (Sabor/Peso):</label>
+                            <input type="text" id="cad-produto-tipo" placeholder="Ex: 1kg - Chocolate" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Preço de Venda Praticado (R$):</label>
+                            <input type="number" id="cad-produto-valor" step="0.01" min="0" placeholder="0,00" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-cadastrar">💾 Salvar Produto na Nuvem</button>
+                </form>
+            </div>
+
+            <div class="card carrinho-container" id="card-aba-carrinho">
+                <h3>🛒 Checkout do Pedido</h3>
+                <ul id="lista-itens" class="lista-itens"></ul>
+                <div>
+                    <div class="total-tela">Total: <span>R$ <span id="total-valor">0.00</span></span></div>
+                    <button type="button" class="btn btn-print" style="margin-top: 15px;" onclick="finalizarEImprimirTicket()">🖨️ Fechar Venda e Emitir Cupom</button>
+                </div>
+            </div>
+
+            <div class="card card-fechamento-compacto" id="card-aba-fechamento">
+                <h3>🔒 Fechamento Consolidado de Caixa</h3>
+                <div class="container-botoes-fechamento" style="display: flex; flex-direction: column; gap: 8px;">
+                    <button type="button" class="btn btn-fechamento" onclick="calcularFechamentoDiario()">🔒 Processar Turno Atual</button>
+                    <button type="button" id="btn-pdf-id" class="btn btn-pdf" onclick="exportarFechamentoPDF()">📥 Gerar Relatório PDF (A4)</button>
+                    <button type="button" id="btn-reset-id" class="btn btn-reset" onclick="reiniciarTurnoComSenha()">⚠️ Reiniciar Turno (Zerar Caixa)</button>
+                </div>
+                
+                <div id="dashboard-vendas-tela" class="dash-container-tela">
+                    <div class="bloco-metricas-caixa">
+                        <div class="card-metrica">
+                            <h4>Faturamento Bruto Acumulado</h4>
+                            <p id="t-dash-faturamento">R$ 0.00</p>
+                        </div>
+                        <div class="card-metrica">
+                            <h4>Total de Pedidos Processados</h4>
+                            <p id="t-dash-qtd-pedidos">0</p>
+                        </div>
+                        <div class="card-metrica">
+                            <h4>Ticket Médio do Turno</h4>
+                            <p id="t-dash-ticket-medio">R$ 0.00</p>
+                        </div>
+                    </div>
+                    <div class="bloco-grafico-caixa">
+                        <canvas id="graficoPizzaFechamento"></canvas>
+                    </div>
+                    <div class="dash-full" style="text-align:center; padding: 5px; font-weight: bold; color: var(--cor-principal); font-size: 13px;">
+                        🎯 Relatório de Suplementos compilado com sucesso!
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" id="card-aba-logs">
+                <h3>📋 Logs Analíticos de Transações (Real-time Firebase)</h3>
+                <div class="tabela-wrapper">
+                    <table class="tabela-comercial">
+                        <thead>
+                            <tr>
+                                <th style="width: 8%;">Nº</th>
+                                <th style="width: 10%;">Hora</th>
+                                <th style="width: 22%;">Cliente</th>
+                                <th style="width: 33%;">Produtos Lançados</th>
+                                <th style="width: 10%;">Método</th>
+                                <th style="width: 8%;">Total</th>
+                                <th style="width: 9%; text-align: center;">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="corpo-historico"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="ticket-print"></div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, setDoc, getDoc, query, orderBy, Timestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        // ==========================================================================
+        // CONFIGURAÇÃO DO SEU NOVO BANCO DE DADOS (Substitua pelos seus dados novos)
+        // ==========================================================================
+        const firebaseConfig = {
+            apiKey: "COLE_AQUI_SUA_API_KEY",
+            authDomain: "COLE_AQUI_SEU_AUTH_DOMAIN",
+            projectId: "COLE_AQUI_SEU_PROJECT_ID",
+            storageBucket: "COLE_AQUI_SEU_STORAGE_BUCKET",
+            messagingSenderId: "COLE_AQUI_SEU_MESSAGING_SENDER_ID",
+            appId: "COLE_AQUI_SEU_APP_ID"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        let pedidoAtual = [];
+        let historicoGeralPedidos = []; 
+        let contadorPedidos = 1;
+        let dadosFechamentoRelatorio = null;
+        let chartPizzaInstancia = null; 
+        let horarioCorteTurno = 0; 
+
+        // ALTERNAR ABAS EM DISPOSITIVOS MÓVEIS
+        window.alternarAbaMobile = function(abaNome, elementoBtn) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            if(elementoBtn) elementoBtn.classList.add('active');
+
+            document.getElementById('card-aba-venda').classList.remove('active-tab-card');
+            document.getElementById('card-aba-cadastro').classList.remove('active-tab-card');
+            document.getElementById('card-aba-carrinho').classList.remove('active-tab-card');
+            document.getElementById('card-aba-fechamento').classList.remove('active-tab-card');
+            document.getElementById('card-aba-logs').classList.remove('active-tab-card');
+
+            if(abaNome === 'venda') document.getElementById('card-aba-venda').classList.add('active-tab-card');
+            if(abaNome === 'cadastro') document.getElementById('card-aba-cadastro').classList.add('active-tab-card');
+            if(abaNome === 'carrinho') document.getElementById('card-aba-carrinho').classList.add('active-tab-card');
+            if(abaNome === 'fechamento') document.getElementById('card-aba-fechamento').classList.add('active-tab-card');
+            if(abaNome === 'logs') document.getElementById('card-aba-logs').classList.add('active-tab-card');
+            
+            window.scrollTo({ top: 0, behavior: 'instant' });
+        };
+
+        // EVENTO: BUSCA DINÂMICA DE PRODUTO POR CÓDIGO DE BARRAS NO CAIXA
+        const inputEanVenda = document.getElementById('venda-codigo-barras');
+        inputEanVenda.addEventListener('input', async (e) => {
+            const codigo = e.target.value.trim();
+            if(codigo.length >= 3) { // Começa a buscar a partir de 3 dígitos para agilizar leitores rápidos
+                try {
+                    const docRef = doc(db, "produtos", codigo);
+                    const docSnap = await getDoc(docRef);
+                    if(docSnap.exists()) {
+                        const prodData = docSnap.data();
+                        document.getElementById('produto-nome').value = prodData.nome;
+                        document.getElementById('produto-tipo').value = prodData.tipo;
+                        document.getElementById('valor').value = parseFloat(prodData.preco).toFixed(2);
+                        document.getElementById('quantidade').focus(); // Joga o cursor para a quantidade automaticamente
+                    } else {
+                        // Limpa se não achar
+                        document.getElementById('produto-nome').value = '';
+                        document.getElementById('produto-tipo').value = '';
+                        document.getElementById('valor').value = '';
+                    }
+                } catch (erro) {
+                    console.error("Erro ao ler código de barras: ", erro);
+                }
+            }
+        });
+
+        // EVENTO: SALVAR NOVO PRODUTO COM CÓDIGO DE BARRAS COMO ID
+        const formCadastro = document.getElementById('form-cadastro-produto');
+        formCadastro.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const ean = document.getElementById('cad-codigo-barras').value.trim();
+            const nome = document.getElementById('cad-produto-nome').value.trim();
+            const tipo = document.getElementById('cad-produto-tipo').value.trim();
+            const preco = parseFloat(document.getElementById('cad-produto-valor').value);
+
+            try {
+                // O código de barras vira o ID exato do documento para busca ultra rápida O(1)
+                await setDoc(doc(db, "produtos", ean), {
+                    nome: nome,
+                    tipo: tipo,
+                    preco: preco,
+                    cadastradoEm: Timestamp.now()
+                });
+                alert(`Sucesso! Produto "${nome}" vinculado ao EAN: ${ean}`);
+                formCadastro.reset();
+                document.getElementById('cad-codigo-barras').focus();
+            } catch (erro) {
+                alert("Erro ao salvar produto!");
+                console.error(erro);
+            }
+        });
+
+        // BUSCAR CLIENTE PELO WHATSAPP
+        window.buscarClientePorTelefone = async function(telDigitado) {
+            const telLimpo = telDigitado.replace(/\D/g, ""); 
+            if (telLimpo.length < 8) return;
+
+            try {
+                const docRef = doc(db, "clientes", telLimpo);
+                const docSnap = await getDoc(docRef);
+
+                if (docSnap.exists()) {
+                    const clienteData = docSnap.data();
+                    document.getElementById('cliente-nome').value = clienteData.nome || '';
+                }
+            } catch (erro) {
+                console.error("Erro ao buscar cliente:", erro);
+            }
+        };
+
+        async function salvarCadastroClienteCloud(telefone, nome) {
+            const telLimpo = telefone.replace(/\D/g, "");
+            if (!telLimpo || !nome) return;
+
+            try {
+                await setDoc(doc(db, "clientes", telLimpo), {
+                    nome: nome,
+                    atualizadoEm: Timestamp.now()
+                });
+            } catch (erro) {
+                console.error("Erro ao salvar cliente:", erro);
+            }
+        }
+
+        async function sincronizarHorarioCorteCloud() {
+            try {
+                const docRef = doc(db, "configuracoes", "turno_atual");
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    horarioCorteTurno = docSnap.data().horarioCorte || 0;
+                } else {
+                    horarioCorteTurno = 0;
+                }
+            } catch (e) {
+                horarioCorteTurno = localStorage.getItem('horarioCorteTurnoSuple') ? parseInt(localStorage.getItem('horarioCorteTurnoSuple')) : 0;
+            }
+        }
+
+        window.validarAcessoSecure = async function(event) {
+            event.preventDefault();
+            const usuarioInput = document.getElementById('login-usuario').value.trim();
+            const senhaInput = document.getElementById('login-senha').value.trim();
+            
+            // Senha padrão original mantida em Base64 ("MTkwNjIw")
+            if (usuarioInput.toLowerCase() === "gabriele" && btoa(senhaInput) === "MTkwNjIw") {
+                document.getElementById('tela-login').style.display = 'none';
+                document.getElementById('conteudo-sistema').style.display = 'block';
+                await sincronizarHorarioCorteCloud();
+                carregarHistoricoDoFirebase();
+            } else {
+                alert("Usuário ou Senha incorretos!");
+                document.getElementById('login-senha').value = '';
+            }
+        };
+
+        async function carregarHistoricoDoFirebase() {
+            try {
+                await sincronizarHorarioCorteCloud();
+                const q = query(collection(db, "pedidos"), orderBy("numero", "desc"));
+                const querySnapshot = await getDocs(q);
+                
+                historicoGeralPedidos = [];
+                const corpoHistorico = document.getElementById('corpo-historico');
+                corpoHistorico.innerHTML = '';
+                
+                let maiorNumeroTurnoAtual = 0;
+
+                querySnapshot.forEach((doc) => {
+                    const dados = doc.data();
+                    const milisegundosDoc = dados.timestamp ? dados.timestamp.toMillis() : 0;
+
+                    if (milisegundosDoc > horarioCorteTurno) {
+                        dados.firebaseId = doc.id;
+                        historicoGeralPedidos.push(dados);
+                        
+                        if (dados.numero > maiorNumeroTurnoAtual) {
+                            maiorNumeroTurnoAtual = dados.numero;
+                        }
+
+                        let resumoItens = dados.itens.map(i => {
+                            return `<span style="color:var(--cor-principal); font-weight:600;">(${i.qtd}x) ${i.prato}</span> - <small>${i.tipo}</small>`;
+                        }).join('<br>');
+                        
+                        corpoHistorico.innerHTML += `
+                            <tr>
+                                <td><strong style="color:var(--cor-principal)">#${String(dados.numero).padStart(2, '0')}</strong></td>
+                                <td>${dados.hora || '00:00'}</td>
+                                <td>${dados.clienteHtml || 'Consumidor Final'}</td>
+                                <td>${resumoItens}</td>
+                                <td><span style="font-size:11px; font-weight:700; padding:4px 8px; background:#334155; border-radius:6px; color:#fff;">${dados.pagamento}</span></td>
+                                <td><strong>R$ ${parseFloat(dados.total || 0).toFixed(2)}</strong></td>
+                                <td style="text-align:center;"><button class="btn-reprint" onclick="reimprimirTicketPorId('${doc.id}')">🖨️ Reimp</button></td>
+                            </tr>
+                        `;
+                    }
+                });
+                
+                contadorPedidos = maiorNumeroTurnoAtual + 1;
+                historicoGeralPedidos.reverse();
+            } catch (erro) {
+                console.error("Erro Firebase ao carregar logs: ", erro);
+            }
+        }
+
+        // ADICIONAR ITEM DA VENDA AO CHECKOUT
+        window.adicionarItem = function(event) {
+            event.preventDefault();
+            const ean = document.getElementById('venda-codigo-barras').value.trim();
+            const nome = document.getElementById('produto-nome').value;
+            const tipo = document.getElementById('produto-tipo').value;
+            const precoUnitario = parseFloat(document.getElementById('valor').value);
+            const qtd = parseInt(document.getElementById('quantidade').value);
+            const pagamento = document.getElementById('forma-pagamento').value;
+
+            const subtotalItem = precoUnitario * qtd;
+
+            pedidoAtual.push({ 
+                id: Date.now(), 
+                prato: nome, // Mapeado na mesma chave do original para preservar integridade
+                tipo: tipo, 
+                precoUnitario: precoUnitario, 
+                qtd: qtd, 
+                valor: subtotalItem,
+                pagamento: pagamento,
+                ean: ean
+            });
+            
+            atualizarInterface();
+
+            // Reseta campos do produto
+            document.getElementById('venda-codigo-barras').value = '';
+            document.getElementById('produto-nome').value = '';
+            document.getElementById('produto-tipo').value = '';
+            document.getElementById('valor').value = '';
+            document.getElementById('quantidade').value = '1';
+            document.getElementById('venda-codigo-barras').focus();
+        };
+
+        window.removerItem = function(id) {
+            pedidoAtual = pedidoAtual.filter(item => item.id !== id);
+            atualizarInterface();
+        };
+
+        function atualizarInterface() {
+            const autoLista = document.getElementById('lista-itens');
+            autoLista.innerHTML = '';
+            let total = 0;
+
+            pedidoAtual.forEach(item => {
+                total += item.valor;
+                autoLista.innerHTML += `
+                    <li class="item-carrinho">
+                        <div style="padding-right: 8px;">
+                            <strong>${item.qtd}x - ${item.prato}</strong> <br>
+                            <small style="color: var(--cor-texto-secundario)">${item.tipo} | R$ ${item.valor.toFixed(2)} [${item.pagamento}]</small>
+                        </div>
+                        <button class="btn-del" onclick="removerItem(${item.id})">X</button>
+                    </li>
+                `;
+            });
+            document.getElementById('total-valor').innerText = total.toFixed(2);
+
+            const badge = document.getElementById('badge-contador-id');
+            if(pedidoAtual.length > 0) {
+                badge.innerText = pedidoAtual.length;
+                badge.style.display = 'block';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+
+        // COMPILAR E EMITIR DUPLA VIA DO CUPOM TÉRMICO
+        function gerarHtmlFitaVia(pedido, nomeVia) {
+            let dadosCliente = pedido.clienteHtml ? pedido.clienteHtml : '<strong>Consumidor Final</strong>';
+
+            let linesProdutosHtml = '';
+            pedido.itens.forEach((item) => {
+                linesProdutosHtml += `
+                    <div class="ticket-item">
+                        <span class="ticket-item-name">${item.qtd}x ${item.prato}</span>
+                        <small>${item.tipo}</small>
+                        <span class="ticket-item-price">R$ ${parseFloat(item.valor).toFixed(2)}</span>
+                    </div>
+                `;
+            });
+
+            return `
+                <div class="ticket-wrapper-via">
+                    <div class="ticket-header">
+                        <div class="ticket-via-tag">--- VIA: ${nomeVia} ---</div><br><br>
+                        <span class="ticket-header-title">POWER NUTRI SUPLEMENTOS</span>
+                        <div class="ticket-divider">--------------------------------</div>
+                        <span class="ticket-header-num-destaque">COMPRA #${String(pedido.numero).padStart(2, '0')}</span>
+                        <div class="ticket-divider">--------------------------------</div>
+                        <div style="font-size: 9px;">DATA: ${pedido.data}</div>
+                    </div>
+                    <div class="ticket-divider">--------------------------------</div>
+                    <div class="ticket-client-info">${dadosCliente}</div>
+                    <div class="ticket-divider">================================</div>
+                    <div style="font-weight: bold; font-size: 10px; margin-bottom: 2px;">ITENS:</div>
+                    <div>${linesProdutosHtml}</div>
+                    <div class="ticket-divider">--------------------------------</div>
+                    <div class="ticket-total-container">
+                        <span>TOTAL:</span>
+                        <span>R$ ${parseFloat(pedido.total || 0).toFixed(2)}</span>
+                    </div>
+                    <div style="font-size:10px; font-weight:bold; margin-top:5px;">Forma de Pgto: ${pedido.pagamento}</div>
+                    <div class="ticket-divider">================================</div>
+                    <div style="text-align:center; font-size:9px; font-weight:bold;">Obrigado! Mantenha o foco nos treinos.</div>
+                    <div class="ticket-divider">--------------------------------</div>
+                    <br><br><br><br><br>
+                </div>
+            `;
+        }
+
+        window.reimprimirTicketPorId = function(firebaseId) {
+            const pedidoMestre = historicoGeralPedidos.find(p => p.firebaseId === firebaseId);
+            if (!pedidoMestre) {
+                alert("Pedido não localizado.");
+                return;
+            }
+            const containerFita = document.getElementById('ticket-print');
+            containerFita.innerHTML = gerarHtmlFitaVia(pedidoMestre, "BALCÃO") + gerarHtmlFitaVia(pedidoMestre, "CLIENTE");
+            window.print();
+        };
+
+        window.finalizarEImprimirTicket = async function() {
+            if (pedidoAtual.length === 0) {
+                alert("Nenhum item lançado no checkout!");
+                return;
+            }
+
+            const nomeCliente = document.getElementById('cliente-nome').value.trim();
+            const celularCliente = document.getElementById('cliente-celular').value.trim();
+
+            const agora = new Date();
+            const dataFormatada = agora.toLocaleDateString('pt-BR') + ' ' + agora.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
+            const horaSimples = agora.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
+
+            let stringClienteHistorico = '';
+            let detalheClienteRelatorio = 'Consumidor Final';
+
+            if (nomeCliente || celularCliente) {
+                detalheClienteRelatorio = '';
+                if (nomeCliente) {
+                    stringClienteHistorico += `<strong>CLIENTE:</strong> ${nomeCliente}<br>`;
+                    detalheClienteRelatorio += `<strong>${nomeCliente}</strong> `;
+                }
+                if (celularCliente) {
+                    stringClienteHistorico += `<strong>WPP:</strong> ${celularCliente}`;
+                    detalheClienteRelatorio += `<br>Tel: ${celularCliente}`;
+                }
+                if (celularCliente && nomeCliente) {
+                    await salvarCadastroClienteCloud(celularCliente, nomeCliente);
+                }
+            }
+
+            let totalPedido = 0;
+            let itensListaSimples = [];
+            let formaPagamentoFinal = pedidoAtual[0].pagamento;
+
+            pedidoAtual.forEach((item) => {
+                totalPedido += item.valor;
+                itensListaSimples.push(`(${item.qtd}x) ${item.prato} - ${item.tipo}`);
+            });
+
+            const documentoPedido = {
+                numero: contadorPedidos,
+                data: dataFormatada,
+                hora: horaSimples,
+                clienteHtml: stringClienteHistorico,
+                clienteA4: detalheClienteRelatorio,
+                itens: [...pedidoAtual],
+                itensTxt: itensListaSimples.join('<br>'),
+                pagamento: formaPagamentoFinal,
+                total: totalPedido,
+                timestamp: Timestamp.now()
+            };
+
+            try {
+                await addDoc(collection(db, "pedidos"), documentoPedido);
+                
+                const containerFita = document.getElementById('ticket-print');
+                containerFita.innerHTML = gerarHtmlFitaVia(documentoPedido, "CAIXA") + gerarHtmlFitaVia(documentoPedido, "CLIENTE");
+
+                await carregarHistoricoDoFirebase();
+                window.print();
+
+                pedidoAtual = [];
+                document.getElementById('cliente-nome').value = '';
+                document.getElementById('cliente-celular').value = '';
+                atualizarInterface();
+                
+                if(window.innerWidth < 950) {
+                    alternarAbaMobile('venda', document.querySelector('.mobile-tabs-nav .tab-btn:first-child'));
+                }
+            } catch (erro) {
+                alert("Erro ao conectar com o Firebase!");
+                console.error(erro);
+            }
+        };
+
+        // PROCESSAR DASHBOARD E FECHAMENTO FINANCEIRO
+        window.calcularFechamentoDiario = function() {
+            if (historicoGeralPedidos.length === 0) {
+                alert("Não existem vendas registradas no turno atual.");
+                return;
+            }
+
+            let faturamentoTotal = 0;
+            let totalItens = 0;
+            let faturamentoPorPrato = {};
+            let faturamentoPorMetodoPagamento = { "Pix": 0, "Cartão": 0, "Dinheiro": 0 };
+
+            historicoGeralPedidos.forEach(p => {
+                let totalPedidoMatematico = parseFloat(p.total || 0);
+                faturamentoTotal += totalPedidoMatematico;
+                
+                let metPag = p.pagamento || "Pix";
+                if (faturamentoPorMetodoPagamento[metPag] !== undefined) {
+                    faturamentoPorMetodoPagamento[metPag] += totalPedidoMatematico;
+                }
+
+                p.itens.forEach(i => {
+                    let itemQtd = parseInt(i.qtd || 1); 
+                    totalItens += itemQtd;
+                    if (!faturamentoPorPrato[i.prato]) faturamentoPorPrato[i.prato] = 0;
+                    faturamentoPorPrato[i.prato] += parseFloat(i.valor || 0);
+                });
+            });
+
+            let ticketMedio = faturamentoTotal / historicoGeralPedidos.length;
+            const agora = new Date();
+            const dataHoraString = `Emissão: ${agora.toLocaleDateString('pt-BR')} às ${agora.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'})}`;
+
+            document.getElementById('t-dash-faturamento').innerText = 'R$ ' + faturamentoTotal.toFixed(2);
+            document.getElementById('t-dash-qtd-pedidos').innerText = historicoGeralPedidos.length + ` (${totalItens} un)`;
+            document.getElementById('t-dash-ticket-medio').innerText = 'R$ ' + ticketMedio.toFixed(2);
+            
+            document.getElementById('dashboard-vendas-tela').style.display = 'grid';
+
+            dadosFechamentoRelatorio = {
+                dataHora: dataHoraString,
+                faturamento: 'R$ ' + faturamentoTotal.toFixed(2),
+                pedidos: historicoGeralPedidos.length + ` vendas (${totalItens} unidades)`,
+                ticket: 'R$ ' + ticketMedio.toFixed(2),
+                porCategoria: faturamentoPorPrato,
+                porPagamento: faturamentoPorMetodoPagamento
+            };
+
+            const ctxPizza = document.getElementById('graficoPizzaFechamento').getContext('2d');
+            if (chartPizzaInstancia) chartPizzaInstancia.destroy();
+
+            chartPizzaInstancia = new Chart(ctxPizza, {
+                type: 'pie',
+                data: {
+                    labels: Object.keys(faturamentoPorPrato),
+                    datasets: [{
+                        data: Object.values(faturamentoPorPrato),
+                        backgroundColor: ['#f97316', '#3b82f6', '#10b981', '#a855f7', '#eab308', '#ec4899', '#6366f1']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'right', labels: { color: '#fff', boxWidth: 10, font: { size: 10 } } }
+                    }
+                }
+            });
+
+            document.getElementById('btn-pdf-id').style.display = 'flex';
+            document.getElementById('btn-reset-id').style.display = 'flex';
+        };
+
+        // EXPORTAR RELATÓRIO COMPLETO EM PDF A4 (VIA IFRAME OCULTO)
+        window.exportarFechamentoPDF = function() {
+            if (!dadosFechamentoRelatorio) return;
+
+            const iframePDF = document.createElement('iframe');
+            iframePDF.style.position = 'fixed'; iframePDF.style.width = '800px'; iframePDF.style.height = '600px'; iframePDF.style.top = '-10000px'; 
+            document.body.appendChild(iframePDF);
+
+            const iframeDoc = iframePDF.contentWindow.document;
+            iframeDoc.open();
+
+            let tabelaPedidosHtml = '';
+            historicoGeralPedidos.forEach(p => {
+                tabelaPedidosHtml += `
+                    <tr>
+                        <td style="padding: 10px 8px; border-bottom: 1px solid #334155;"><strong>#${String(p.numero).padStart(2, '0')}</strong><br>${p.hora}</td>
+                        <td style="padding: 10px 8px; border-bottom: 1px solid #334155;">${p.clienteA4}</td>
+                        <td style="padding: 10px 8px; border-bottom: 1px solid #334155;">${p.itensTxt}</td>
+                        <td style="padding: 10px 8px; border-bottom: 1px solid #334155; text-align:center;">${p.pagamento}</td>
+                        <td style="padding: 10px 8px; border-bottom: 1px solid #334155; text-align:right;"><strong>R$ ${parseFloat(p.total).toFixed(2)}</strong></td>
+                    </tr>`;
+            });
+
+            let stringMeiosPagamentoHtml = '';
+            for (const [metodo, valor] of Object.entries(dadosFechamentoRelatorio.porPagamento)) {
+                stringMeiosPagamentoHtml += `<tr><td style="padding: 10px 12px; border-bottom: 1px solid #e2e8f0;">⚡ ${metodo}</td><td style="padding: 10px 12px; border-bottom: 1px solid #e2e8f0; text-align:right; font-weight:bold;">R$ ${valor.toFixed(2)}</td></tr>`;
+            }
+
+            iframeDoc.write(`
+                <html>
+                <head>
+                    <style>
+                        body { padding: 20px; font-family: Arial, sans-serif; color: #0f172a; }
+                        .header { border-bottom: 4px solid #f97316; padding-bottom: 10px; margin-bottom: 20px; }
+                        .section-title { font-weight: bold; background: #f1f5f9; padding: 8px; margin-top: 20px; border-left: 4px solid #f97316; text-transform: uppercase; font-size:12px;}
+                        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size:12px; }
+                        th { background: #f8fafc; padding: 8px; text-align: left; border-bottom: 2px solid #cbd5e1; }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <h2>PowerNutri Suplementos - Relatório de Turno</h2>
+                        <div>${dadosFechamentoRelatorio.dataHora}</div>
+                    </div>
+                    <div class="section-title">Resumo Gerencial</div>
+                    <table>
+                        <tr><td>Faturamento Bruto:</td><td><strong>${dadosFechamentoRelatorio.faturamento}</strong></td></tr>
+                        <tr><td>Volume Atendido:</td><td>${dadosFechamentoRelatorio.pedidos}</td></tr>
+                        <tr><td>Ticket Médio:</td><td>${dadosFechamentoRelatorio.ticket}</td></tr>
+                    </table>
+                    <div class="section-title">Meios de Pagamento</div>
+                    <table>${stringMeiosPagamentoHtml}</table>
+                    <div class="section-title">Transações Analíticas</div>
+                    <table>
+                        <thead><tr><th>Ref/Hora</th><th>Cliente</th><th>Itens</th><th>Forma</th><th>Total</th></tr></thead>
+                        <tbody>${tabelaPedidosHtml}</tbody>
+                    </table>
+                </body>
+                </html>
+            `);
+            iframeDoc.close();
+
+            const configuracoes = {
+                margin: [15, 14, 15, 14],
+                filename: `Fechamento_PowerNutri_${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.pdf`,
+                image: { type: 'jpeg', quality: 1.0 },
+                html2canvas: { scale: 2, width: 790 },
+                jsPDF: { format: 'a4', orientation: 'portrait' }
+            };
+
+            html2pdf().set(configuracoes).from(iframeDoc.body).save().then(() => {
+                iframePDF.remove();
+            });
+        };
+
+        // ENCERRAMENTO E ALINHAMENTO DE TURNO GLOBAL VIA SENHA MASTER (1234)
+        window.reiniciarTurnoComSenha = async function() {
+            const senhaDigitada = prompt("Para zerar o caixa e iniciar o próximo turno, digite a senha master:");
+            if (senhaDigitada === "1234") {
+                const novoHorarioCorte = Date.now();
+                
+                try {
+                    await setDoc(doc(db, "configuracoes", "turno_atual"), {
+                        horarioCorte: novoHorarioCorte,
+                        atualizadoPor: "gabriele",
+                        timestamp: Timestamp.now()
+                    });
+                    
+                    localStorage.setItem('horarioCorteTurnoSuple', novoHorarioCorte);
+                    horarioCorteTurno = novoHorarioCorte;
+
+                    historicoGeralPedidos = [];
+                    contadorPedidos = 1;
+                    dadosFechamentoRelatorio = null;
+                    
+                    document.getElementById('corpo-historico').innerHTML = ''; 
+                    document.getElementById('dashboard-vendas-tela').style.display = 'none';
+                    document.getElementById('btn-pdf-id').style.display = 'none';
+                    document.getElementById('btn-reset-id').style.display = 'none';
+                    
+                    alert("Turno encerrado! O caixa iniciou no Pedido #01 na nuvem.");
+                    await carregarHistoricoDoFirebase();
+                } catch(e) {
+                    alert("Erro de conexão.");
+                }
+            } else if (senhaDigitada !== null) {
+                alert("Senha incorreta!");
+            }
+        };
+    </script>
+</body>
+</html>
